@@ -1,0 +1,31 @@
+{
+  "name": "planning_mcdo",
+  "version": "1.0.0",
+  "description": "Plannings McDonalds pour employer",
+  "main": "server.js",
+  "scripts": {
+    "start_server": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "author": "KronosDev <kronosdev.pro@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@mapbox/node-pre-gyp": "^1.0.5",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "csurf": "^1.11.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "helmet": "^3.23.3",
+    "mongodb": "^3.6.3",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.7",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "sqlite3": "^5.0.2"
+  },
+  "devDependencies": {}
+}
