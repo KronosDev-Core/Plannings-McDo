@@ -15,6 +15,9 @@ body {
 .LogoMcDo {
   background-color: #044314;
   color: #f9c304;
+  outline: none;
+  border: 0;
+  box-shadow: none;
 }
 
 ::-webkit-scrollbar-track {

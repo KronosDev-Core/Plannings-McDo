@@ -1,65 +1,5 @@
 const ErrorValidationForm = "Ce Champ doit être rempli !";
 
-const FUNCTION = {
-  ConvertTimeTable: (FullHeure, data) => {
-    if (FullHeure.search(";") !== -1) {
-      var SplitHeure = FullHeure.split(";"),
-        res = "";
-
-      SplitHeure.forEach((element, index) => {
-        var Work = '';
-
-        var elemSplit = element.split(" - "), Time1 = elemSplit[0].split(":"), Time2 = elemSplit[1].split(":");
-        var h1 = Number(Time1[0]), m1 = Number(Time1[1]),
-            h2 = Number(Time2[0]), m2 = Number(Time2[1]),
-            h3 = new Date().getHours(), m3 = new Date().getMinutes();
-
-        if (data[index].DayDate === `${new Date().setFullTime(2, 0, 0, 0)}`) {
-          if ((h3 > h1 && h3 < h2) || ((h3 == h1 && m3 >= m1) || (h3 == h2 && !(m3 > m2)))) {
-            Work = "text-warning";
-          } else {
-            if (h2 < h3 || (h2 == h3 && m3 >= m2)) Work = "text-success"
-            else Work = "text-danger";
-          }
-        } else {
-          Work = 'text-success';
-        }
-
-        if (index + 1 == SplitHeure.length) {
-          res += `<p class="Time-${data[index].id} ${Work}">${element}</p>`;
-        } else {
-          res += `<p class="Time-${data[index].id} ${Work}">${element}</p>
-                  <hr class="dropdown-divider">
-                  `;
-        }
-
-      });
-
-      return res;
-    } else {
-      var Work = '';
-
-      var elemSplit = FullHeure.split(" - "), Time1 = elemSplit[0].split(":"), Time2 = elemSplit[1].split(":");
-      var h1 = Number(Time1[0]), m1 = Number(Time1[1]),
-          h2 = Number(Time2[0]), m2 = Number(Time2[1]),
-          h3 = new Date().getHours(), m3 = new Date().getMinutes();
-
-      if (data.DayDate === `${new Date().setFullTime(2, 0, 0, 0)}`) {
-        if ((h3 > h1 && h3 < h2) || ((h3 == h1 && m3 >= m1) || (h3 == h2 && !(m3 > m2)))) {
-          Work = "text-warning";
-        } else {
-          if (h2 < h3 || (h2 == h3 && m3 >= m2)) Work = "text-success"
-          else Work = "text-danger";
-        }
-      } else {
-        Work = 'text-success';
-      }
-
-      return `<p class="Time-${data.id} ${Work}">${FullHeure}</p>`;
-    }
-  },
-};
-
 const DATA = {
   DayWeekDate: [
     "Dimanche",
@@ -71,21 +11,124 @@ const DATA = {
     "Samedi",
   ],
   DayWeekDataTable: [9, 3, 4, 5, 6, 7, 8],
+  Role: {
+    LST: "Service à table",
+    LCA: "Chargé d'acceuil",
+    LN: "Néttoyage lobby",
+    CPE: "Passage éxterieur",
+    CBL: "Boisson lobby",
+    CBD: "Boisson drive",
+    CG: "Glace",
+    CPB: "Passage boisson",
+    CVL: "Vérif lobby",
+    CVD: "Vérif Drive",
+    CEL: "Encaissement lobby",
+    CED: "Encaissement drive",
+    CRC: "Rappel Commande",
+    CTD: "Tablette drive",
+    CTL: "Tablette lobby",
+    COL: "OAT lobby",
+    COD: "OAT drive",
+    CO: "OAT",
+    CF: "Frite",
+    CRZ: "RZ Comptoir",
+    KRZ: "RZ Cuisine",
+    KP: "Pain",
+    KG: "Garniture",
+    KU: "UHC",
+    KDU: "Double UHC",
+    KCF: "Cuisson frit",
+    KCV: "Cuisson viande",
+    KDC: "Double cuisson"
+  }
+};
+
+
+const FUNCTION = {
+  ConvertTimeTable: (FullHeure, data, SameWeek) => {
+    if (FullHeure.search(";") !== -1) {
+      var SplitHeure = FullHeure.split(";"),
+        res = "";
+
+      SplitHeure.forEach((element, index) => {
+        var Work = '';
+
+        if (SameWeek) {
+          var elemSplit = element.split(" - "), Time1 = elemSplit[0].split(":"), Time2 = elemSplit[1].split(":");
+          var h1 = Number(Time1[0]), m1 = Number(Time1[1]),
+              h2 = Number(Time2[0]), m2 = Number(Time2[1]),
+              h3 = new Date().getHours(), m3 = new Date().getMinutes();
+
+          if (h2 < 5) h2 += 23;
+  
+          
+          if (data[index].DayDate === `${new Date().setFullTime(2, 0, 0, 0)}`) {
+            if ((h3 > h1 && h3 < h2) || ((h3 == h1 && m3 >= m1) || (h3 == h2 && !(m3 > m2)))) {
+              Work = "text-warning";
+            } else {
+              if (h2 < h3 || (h2 == h3 && m3 >= m2)) Work = "text-success"
+              else Work = "text-danger";
+            }
+          } else {
+            if (new Date(Number(data[index].DayDate)).getDay() < new Date().getDay() || (new Date().getDay() === 0 && new Date(Number(data[index].DayDate)).getDay() != 0)) Work = "text-success"
+            else Work = "text-danger";
+          }
+        }
+
+
+        if (index + 1 == SplitHeure.length) {
+          res += `<p class="Time-${data[index]._id} ${Work}">${element}</p>`;
+        } else {
+          res += `<p class="Time-${data[index]._id} ${Work}">${element}</p>
+                  <hr class="dropdown-divider">
+                  `;
+        }
+
+      });
+
+      return res;
+    } else {
+      var Work = '';
+
+      if (SameWeek) {
+        var elemSplit = FullHeure.split(" - "), Time1 = elemSplit[0].split(":"), Time2 = elemSplit[1].split(":");
+        var h1 = Number(Time1[0]), m1 = Number(Time1[1]),
+            h2 = Number(Time2[0]), m2 = Number(Time2[1]),
+            h3 = new Date().getHours(), m3 = new Date().getMinutes();
+
+        if (h2 < 5) h2 += 23;
+  
+        if (data.DayDate === `${new Date().setFullTime(2, 0, 0, 0)}`) {
+          if ((h3 > h1 && h3 < h2) || ((h3 == h1 && m3 >= m1) || (h3 == h2 && !(m3 > m2)))) {
+            Work = "text-warning";
+          } else {
+            if (h2 < h3 || (h2 == h3 && m3 >= m2)) Work = "text-success"
+            else Work = "text-danger";
+          }
+        } else {
+          if (new Date(Number(data.DayDate)).getDay() < new Date().getDay() || new Date(Number(data.DayDate)).getDay() != 0) Work = "text-success"
+          else Work = "text-danger";
+        }
+      }
+
+      return `<p class="Time-${data._id} ${Work}">${FullHeure}</p>`;
+    }
+  },
 };
 
 const HTML = {
   SelectOptionEmployee: (data) => {
-    return `<option value="${data.id}">${data.id} | ${
+    return `<option value="${data._id}">${data.id} | ${
       data.name
-    } | ${data.MaxHour.replace(".", ",")}h/sem</option>`;
+    } | ${String(data.MaxHour).replace(".", ",")}h/sem</option>`;
   },
   SelectOptionTimeWork: (data) => {
     if (data.Absent) {
-      return `<option value="${data.id}">${data.id} | Abs le ${new Date(
+      return `<option value="${data._id}">Absent le ${new Date(
         Number(data.DayDate)
       ).toDateString()}`;
     } else {
-      return `<option value="${data.id}">${data.id} | de ${data.StartHour.replace(".", "h")} à ${
+      return `<option value="${data._id}">Present de ${data.StartHour.replace(".", "h")} à ${
         data.EndHour.replace(".", "h")
       } le ${new Date(Number(data.DayDate)).FormatDM()}`;
     }
@@ -110,7 +153,12 @@ const HTML = {
     <div id="SubOptionAdmin"></div>
     <div id="NextAdmin"></div>
     `,
-  AdminFormOption: `
+  AdminFormOption: (data) => {
+  var extra = "";
+
+  if (data.permission === "Manager") extra = "disabled"
+    
+  return `
   <div class="w-100 d-inline-flex">
       <div class="rounded-pill w-10"><hr></div>
       <div class="mx-2 my-auto text-nowrap"><p class="m-auto">Select Option</p></div>
@@ -120,13 +168,14 @@ const HTML = {
   <div class="row m-1">
       <div class="col input-group">
           <select class="form-select" aria-label="select option">
-              <option selected="true" disabled>Select Option</option>
-              <option value="EditEmp">Edit Employee</option>
-              <option value="NewWor">New Time Work</option>
-              <option value="EditWor">Edit Time Work</option>
+              <option  ${data.permission === "Manager" ? "" : "selected"} disabled>Select Option</option>
+              <option value="EditEmp" ${extra}>Edit Employee</option>
+              <option value="NewWor" ${extra}>New Time Work</option>
+              <option value="EditWor" ${data.permission === "Manager" ? "selected" : ""}>Edit Time Work</option>
           </select>
       </div>
-  </div>`,
+  </div>`;
+  },
   AdminFormSubOption: `
   <div class="w-100 d-inline-flex">
       <div class="rounded-pill w-10"><hr></div>
@@ -151,7 +200,7 @@ const HTML = {
       DefaultId =
         data.type === "new"
           ? ""
-          : `<input type="text" class="d-none" name="DefaultId" value="${data.id}">`;
+          : `<input type="text" class="d-none" name="_id" value="${data.value._id}">`;
 
     return `
     <div class="w-100 d-inline-flex">
@@ -166,7 +215,7 @@ const HTML = {
         <div class="row m-1">   
             <div class="col input-group">
                 <span class="input-group-text">Prénom et Nom</span>
-                <input type="text" class="form-control" name="name" placeholder="Prénom et Nom" ${FullName} required>
+                <input type="text" class="form-control text-uppercase" name="name" placeholder="Prénom et Nom" aria-autocomplete="both" ${FullName} required>
                 <div class="invalid-feedback">
                 ${ErrorValidationForm}
                 </div>
@@ -198,6 +247,29 @@ const HTML = {
     </form>
     `;
   },
+  InputRoleEmployee: (data) => { 
+    var Option = "", extra = false;
+    console.log(data, extra)
+
+    if (data.Role !== "" && Object.keys(DATA.Role).indexOf(data.Role) !== -1) extra = true;
+    
+    Object.keys(DATA.Role).forEach((elem, index) => {
+      console.log(elem, index, DATA.Role[Object.keys(DATA.Role)[index]]);
+      if (extra && elem === data.Role) Option += `<option value="${elem}" selected>${DATA.Role[Object.keys(DATA.Role)[index]]}</option>`
+      else Option += `<option value="${elem}">${DATA.Role[Object.keys(DATA.Role)[index]]}</option>`
+    });
+
+    return `
+    <span class="input-group-text">Role</span>
+    <select name="Role" class="form-select">
+      <option ${extra ? "" : "selected"} disabled>Sélectionner un rôle</option>
+      ${Option}
+    </select>
+    <div class="invalid-feedback">
+      ${ErrorValidationForm}
+    </div>
+    `
+  },
   TemplateFormTimeWork: (data) => {
     var title = data.type === "new" ? "New time work" : "Edit time work",
       DeleteBtn = data.type === "new" ? "disabled" : "",
@@ -206,7 +278,12 @@ const HTML = {
       DayDate =
         data.type === "new"
           ? ""
-          : `value="${new Date(Number(data.value.DayDate)).FormatYMD()}"`;
+          : `value="${new Date(Number(data.value.DayDate)).FormatYMD()}"`,
+      DefaultId =
+        data.type === "new"
+          ? ""
+          : `<input type="text" class="d-none" name="_id" value="${data.value._id}">`,
+      PermDisabled = data.permission === "Manager" ? "readonly" : "";
 
     if (data.type !== "new") {
       if (data.value.Absent) {
@@ -218,11 +295,6 @@ const HTML = {
       }
     }
 
-    if ("new" === data.type)
-      var multiple =
-        '\n      <div class="row m-1">\n        <div class="col input-group">\n          <div class="form-control">\n            <input type="checkbox" class="form-check-input" name="Multiple">\n            Enregistrement multiple\n          </div>\n        </div>\n      </div>\n      ';
-    else var multiple = "";
-
     return `
     <div class="w-100 d-inline-flex">
         <div class="rounded-pill w-10"><hr></div>
@@ -233,22 +305,19 @@ const HTML = {
     <form method="POST" action="/Horaire">
         <input type="text" class="d-none" name="StartWeek" value="${data.StartWeek.getTime()}">
         <input type="text" class="d-none" name="type" value="${data.type}">
-
-        ${multiple}
+        ${DefaultId}
 
         <div class="row m-1">
             <div class="col input-group">
                 <span class="input-group-text">Numéro de pointage</span>
-                <input type="number" class="form-control" name="id" placeholder="Numéro de pointage" value="${
-                  data.id
-                }" readonly>
+                <input type="number" class="form-control" name="id" placeholder="Numéro de pointage" value="${data.id}" readonly>
                 <div class="invalid-feedback">
                     ${ErrorValidationForm}
                 </div>
 
                 
-                <div class="form-control">
-                    <input type="checkbox" class="form-check-input" value="" name="Absent" ${check}>
+                <div class="form-control" ${PermDisabled}>
+                    <input type="checkbox" class="form-check-input" value="" name="Absent" ${check} ${PermDisabled}>
                     Absent / Week-end
                 </div>
                 <div class="invalid-feedback">
@@ -260,22 +329,29 @@ const HTML = {
         <div class="row m-1">
             <div class="col input-group">
                 <span class="input-group-text">Date</span>
-                <input type="date" class="form-control" name="DayDate" ${DayDate} required>
+                <input type="date" class="form-control" name="DayDate" ${DayDate} required ${PermDisabled}>
                 <div class="invalid-feedback">
-                ${ErrorValidationForm}
+                  ${ErrorValidationForm}
                 </div>
                 <span class="input-group-text">Horaire</span>
-                <input type="time" class="form-control" name="StartHour" ${StartHour} required>
+                <input type="time" class="form-control" name="StartHour" ${StartHour} required ${PermDisabled}>
                 <div class="invalid-feedback">
-                ${ErrorValidationForm}
+                  ${ErrorValidationForm}
                 </div>
                 <span class="input-group-text">-</span>
-                <input type="time" class="form-control" name="EndHour" ${EndHour} required>
+                <input type="time" class="form-control" name="EndHour" ${EndHour} required ${PermDisabled}>
                 <div class="invalid-feedback">
-                ${ErrorValidationForm}
+                  ${ErrorValidationForm}
                 </div>
             </div>
         </div>
+
+        <div class="row m-1">
+          <div class="col input-group">
+            ${data.permission === "Manager" ? HTML.InputRoleEmployee(data.value) : ""}
+          </div>
+        </div>
+      
         <div class="row m-1 justify-content-md-center">
             <div class="col-auto btn-group" role="group">
             <button type="button" class="btn btn-outline-danger" ${DeleteBtn}>Delete Time Work</button>
@@ -291,7 +367,7 @@ const HTML = {
     return `
         <tr>
             <th name="id" scope="row">${data.id}</th>
-            <th name="fullname">${data.name}</th>
+            <th name="fullname">${String(data.name).toUpperCase()}</th>
             <td name="monday" class="w-auto"></td>
             <td name="tuesday" class="w-auto"></td>
             <td name="wednesday" class="w-auto"></td>
@@ -376,66 +452,82 @@ const HTML = {
       `;
     }
   },
+  OptionEmploye: `
+  <button class="btn btn-outline-dark border-0"><i class="bi bi-clipboard"></i></button>
+  <button class="btn btn-outline-warning border-0" data-bs-toggle="tooltip" tabindex="0" data-bs-placement="bottom" data-bs-html="true" title=""><i class="bi bi-cash-coin"></i></button>
+  `
 };
 
 const HREF = {
   DivFormCardFooter:
-    "body > div.my-3.h-100.container-fluid > div > div.col-auto > div > div.card-footer",
+    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-footer",
   ListUniqueWorkerButton: "div.card-body > ul li button",
   AnimationArrow: "RotateArrow",
   RowTableCard:
-    "body > div.my-3.h-100.container-fluid > div > div.col-auto > div > div.card-body.table-responsive > table > tbody tr",
+    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-body.table-responsive > table > tbody tr",
   ListUniqueWorkerHeader:
-    "body > div.my-3.h-100.container-fluid > div > div.col > div > div.card-header > h5",
+    "body > div.my-3.h-100.w-100.container-fluid > div > div.col > div > div.card-header > div > h5",
   InputSelectEmployee:
-    "body > div.my-3.h-100.container-fluid > div > div.col-auto > div > div.card-footer > div.row.m-1 > div > select",
+    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-footer > div.row.m-1 > div > select",
   InputSelectEmployeeOption:
-    "body > div.my-3.h-100.container-fluid > div > div.col-auto > div > div.card-footer > div.row.m-1 > div > select option",
+    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-footer > div.row.m-1 > div > select option",
   InputSelectOption: "#OptionAdmin > div.row.m-1 > div > select",
   InputSelectOptionOption: "#OptionAdmin > div.row.m-1 > div > select option",
   InputSelectSubOption: "div#SubOptionAdmin > div.row.m-1 > div > select",
   InputSelectSubOptionOption:
     "div#SubOptionAdmin > div.row.m-1 > div > select option",
   DivNextAdminForm: "div#NextAdmin",
-  DivAdminOption: "div#OptionAdmin",
+  DivAdminOption: "#OptionAdmin",
   DivAdminSubOption: "div#SubOptionAdmin",
-  InputFormID: "div#NextAdmin > form > div:nth-child(3) > div > input",
+  InputFormID: "#NextAdmin > form > div:nth-child(3) > div > input",
   InputFormDate:
-    "div#NextAdmin > form > div:nth-child(4) > div > input:nth-child(2)",
+    "#NextAdmin > form > div:nth-child(4) > div > input:nth-child(2)",
   InputFormStartWeek: "div#NextAdmin > form > input:nth-child(1)",
   InputFormTimeStart:
-    "div#NextAdmin > form > div:nth-child(4) > div > input:nth-child(5)",
+    "#NextAdmin > form > div:nth-child(4) > div > input:nth-child(5)",
   InputFormTimeEnd:
-    "div#NextAdmin > form > div:nth-child(4) > div > input:nth-child(8)",
+    "#NextAdmin > form > div:nth-child(4) > div > input:nth-child(8)",
   InputFormCheckAbsent:
-    "div#NextAdmin > form > div:nth-child(3) > div > div.form-control > input",
+    "#NextAdmin > form > div:nth-child(3) > div > div.form-control > input",
+  InputFormFullName: "#NextAdmin > form > div:nth-child(3) > div > input",
   TitleTableCard:
-    "body > div.my-3.h-100.container-fluid > div > div.col-auto > div > div.card-header > h5",
+    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-header > div > h5",
   ButtonFormCardFooter:
     "div#NextAdmin > form > div.row.m-1.justify-content-md-center > div > button.btn.btn-outline-success",
-  ButtonDeleteEmployee:
+  ButtonDeleteForm:
     "div#NextAdmin > form > div.row.m-1.justify-content-md-center > div > button.btn.btn-outline-danger",
   BodyTable:
-    "body > div.my-3.h-100.container-fluid > div > div.col-auto > div > div.card-body.table-responsive > table > tbody",
+    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-body.table-responsive > table > tbody",
   TableSpecificLine: (data) => {
-    return `body > div.my-3.h-100.container-fluid > div > div.col-auto > div > div.card-body.table-responsive > table > tbody > tr:nth-child(${data.row}) > td:nth-child(${data.column})`;
+    if (data.column !== undefined) return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-body.table-responsive > table > tbody > tr:nth-child(${data.row}) > td:nth-child(${data.column})`
+    else return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-body.table-responsive > table > tbody > tr:nth-child(${data.row})`
   },
   CardSpecificDay: (data) => {
     return `#collapse${data}`;
   },
   SelectSpecificEmployee: (data) => {
-    return `body > div.my-3.h-100.container-fluid > div > div.col-auto > div > div.card-footer > div.row.m-1 > div > select > option[value='${data}']`;
+    return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-footer > div.row.m-1 > div > select > option[value='${data}']`;
   },
+  SelectSpecificOptionEmploye: (data) => {return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-footer > div.row.m-1 > div > select > option:nth-child(${data})`},
   SelectSpecificOption: (data) => {
     return `#OptionAdmin > div.row.m-1 > div > select > option[value='${data}']`;
   },
   SelectSpecificSubOption: (data) => {
     return `div#SubOptionAdmin > div.row.m-1 > div > select > option[value='${data}']`;
   },
-  SelectTimeWeek: "body > div.my-3.h-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-header > select",
-  SelectTimeWeekAllOption: "body > div.my-3.h-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-header > select option",
+  SelectTimeWeek: "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-header > div > select",
+  SelectTimeWeekAllOption: "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-header > div > select option",
   SelectTimeWeekOption: (data) => {
-    return `body > div.my-3.h-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-header > select > option:nth-child(${data+1})`
+    return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-header > div > select > option:nth-child(${data+1})`
   },
-  SpecificColumnTable: (data) => { return `body > div.my-3.h-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-body.table-responsive > table * > tr *:nth-child(${data})` },
+  SpecificColumnTable: (data) => { return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-body.table-responsive > table * > tr *:nth-child(${data})` },
+  SpecificDropDownCard: (data) => { return `body > div.my-3.h-100.w-100.container-fluid > div > div.col > div > div.card-body > ul > li > button > div[value="${data}"]`; },
+  AllPTextWarning: "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-body.table-responsive > table > tbody > tr td p.text-warning",
+  PTotalEmpWork: "p#TotalEmpWork",
+  BtnOptionEmploye: "#BtnOptionEmploye",
+  DivOptionEmploye: "#OptionEmploye",
+  BtnSalaireEmploye: "#OptionEmploye > button.btn.btn-outline-warning.border-0",
+  RoleEmployeeWorkTimeDiv: "#NextAdmin > form > div:nth-child(6) > div",
+  BtnSearchBar: "body > div.sticky-top.bg-light > nav > div > div.d-flex > button.btn.LogoMcDo.me-4",
+  InputSearchBar: "body > div.sticky-top.bg-light > nav > div > div.d-flex > input",
 };

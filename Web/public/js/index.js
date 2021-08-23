@@ -31,6 +31,10 @@ Date.prototype.setFullTime = function (h = 0, m = 0, s = 0, ms = 0) {
   return date.setHours(h, m, s, ms);
 }
 
+Number.prototype.round = function () {
+  return Math.round((this + Number.EPSILON) * 100) / 100;
+}
+
 function getFormatInputTime(time) {
   var H = time.split(":")[0],
     m = time.split(":")[1],
@@ -48,20 +52,21 @@ function ToFormatInputTime(time) {
 }
 
 function ToFormatCardFromTable(data) {
-  return data.replaceAll(/<p class="Time-[0-9]{2} .*">/gm, "").replaceAll("</p>", "").replaceAll('<hr class="dropdown-divider">', " ; ").replaceAll(/\n/gm, "").replaceAll("                    ", "").replaceAll(/^ /gm, "");
+  return data.replaceAll(/(<p class="Time-.*">|<p>)/gm, "").replaceAll("</p>", "").replaceAll('<hr class="dropdown-divider">', " ; ").replaceAll(/\n/gm, "").replaceAll("                    ", "").replaceAll(/^ /gm, "");
 }
 
-function GetDataTable(FullName, id, HourMonday, HourTuesday, HourWednesday, HourThursday, HourFriday, HourSaturday, HourSunday, href) {
-  FullName = href.children[1].innerHTML;
-  id = href.children[0].innerHTML;
+function GetDataTable(FullName, id, HourMonday, HourTuesday, HourWednesday, HourThursday, HourFriday, HourSaturday, HourSunday, TotalHour, HREF) {
+  FullName = HREF.children[1].innerHTML;
+  id = HREF.children[0].innerHTML;
 
-  HourMonday = ToFormatCardFromTable(href.children[2].innerHTML);
-  HourTuesday = ToFormatCardFromTable(href.children[3].innerHTML);
-  HourWednesday = ToFormatCardFromTable(href.children[4].innerHTML);
-  HourThursday = ToFormatCardFromTable(href.children[5].innerHTML);
-  HourFriday = ToFormatCardFromTable(href.children[6].innerHTML);
-  HourSaturday = ToFormatCardFromTable(href.children[7].innerHTML);
-  HourSunday = ToFormatCardFromTable(href.children[8].innerHTML);
+  HourMonday = ToFormatCardFromTable(HREF.children[2].innerHTML);
+  HourTuesday = ToFormatCardFromTable(HREF.children[3].innerHTML);
+  HourWednesday = ToFormatCardFromTable(HREF.children[4].innerHTML);
+  HourThursday = ToFormatCardFromTable(HREF.children[5].innerHTML);
+  HourFriday = ToFormatCardFromTable(HREF.children[6].innerHTML);
+  HourSaturday = ToFormatCardFromTable(HREF.children[7].innerHTML);
+  HourSunday = ToFormatCardFromTable(HREF.children[8].innerHTML);
+  TotalHour = HREF.children[9].innerHTML.split(" ")[0]
   return {
     FullName,
     id,
@@ -71,7 +76,8 @@ function GetDataTable(FullName, id, HourMonday, HourTuesday, HourWednesday, Hour
     HourThursday,
     HourFriday,
     HourSaturday,
-    HourSunday
+    HourSunday,
+    TotalHour
   };
 }
 
@@ -96,15 +102,28 @@ function FormatCompactDate(date, type = "day") {
 
 function SimulateEvent(element, typeEvent = "change") {
   if (!element) {
-    console.log("[ SimulateEvent ] (element) - ", element)
     return new Error("element n'est pas définie");
   } else if ("createEvent" in document) {
     var evt = document.createEvent("HTMLEvents");
     evt.initEvent(typeEvent, false, true);
-    console.log("[ SimulateEvent ] (evt, element) - ", evt, element)
     element.dispatchEvent(evt);
     return evt;
   }
+}
+
+function TimeBetweenTwoTime(hour1, hour2) {
+  hour1 = hour1.split(":");
+  hour2 = hour2.split(":");
+  var Date2 = new Date();
+  if (hour2[0] == "00") Date2.setDate(Date2.getDate()+1)
+  return Number(Number(new Date((Date2.setHours(hour2[0], hour2[1], 0, 0) - new Date().setHours(hour1[0], hour1[1], 0, 0))))/3.6e6).round();
+}
+
+function ReloadTooltips() {
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl, {sanitize: false});
+  });
 }
 
 Array.prototype.last = function () {
@@ -123,7 +142,10 @@ kronos(() => {
   localStorage.removeItem("employee");
 
   let EmployeTableLine = {},
-    DataPreSortTable = {};
+    DataPreSortTable = {},
+    Employeid_id = {},
+    SameWeek = null,
+    EmployeNameId = {};
 
   function TitleWeek(index = 0) {
     var StartWeek = FullWeek[index][0],
@@ -163,10 +185,13 @@ kronos(() => {
     if (!find) TitleWeek()
   }
 
+  if (Number(localStorage.getItem("currentWeek")) === FullWeek[0][2]) SameWeek = true
+  else SameWeek = false;
+
   kronos(HREF.SelectTimeWeek).on('change', (event) => {
     TitleWeek(Number(event.target.value))
     document.location.reload();
-  })
+  });
 
   kronos(HREF.ListUniqueWorkerButton).forEach((elem) =>
     elem.addEventListener("click", (event) => {
@@ -183,165 +208,209 @@ kronos(() => {
     })
   );
 
-  Boolean(localStorage.getItem("ADMIN")) ?
-    kronos(HREF.DivFormCardFooter).html(HTML.DivFormCardFooterHtmlForm) :
+  if (JSON.parse(localStorage.getItem("account")).permission === "Administration" || JSON.parse(localStorage.getItem("account")).permission === "Manager") {
+    kronos(HREF.DivFormCardFooter).html(HTML.DivFormCardFooterHtmlForm)
+  } else {
     kronos(HREF.DivFormCardFooter).remove();
+  }
+
+  DATA.DayWeekDate.forEach((elem, index) => {
+    var day = new Date().getDay();
+
+    if (SameWeek) {
+      if (day === 0) {
+        if (elem === DATA.DayWeekDate[day]) {
+          kronos(HREF.SpecificDropDownCard(elem)).class("add", "text-warning")
+        } else {
+          kronos(HREF.SpecificDropDownCard(elem)).class("add", "text-success")
+        }
+      } else {
+        if (elem === DATA.DayWeekDate[day]) {
+          kronos(HREF.SpecificDropDownCard(elem)).class("add", "text-warning")
+        } else {
+          if (index < day) kronos(HREF.SpecificDropDownCard(elem)).class("add", "text-success")
+          else kronos(HREF.SpecificDropDownCard(elem)).class("add", "text-danger")
+          kronos(HREF.SpecificDropDownCard(DATA.DayWeekDate[0])).class("add", "text-danger")
+        }
+      }
+    }
+
+  })
   
   // Admin Section
-  kronos().request("POST", "/Employe", {
-    type: "get"
-  }, (data) => {
-    data.forEach((elem) => {
-      kronos(HREF.InputSelectEmployee).append(HTML.SelectOptionEmployee(elem));
-    });
+  if (JSON.parse(localStorage.getItem("account")).permission === "Administration" || JSON.parse(localStorage.getItem("account")).permission === "Manager") {
+    kronos().request("POST", "/Employe", {
+        type: "get"
+      }, 
+      (data) => {
+        data.forEach((elem) => {
+          kronos(HREF.InputSelectEmployee).append(HTML.SelectOptionEmployee(elem));
+        });
 
-    kronos(HREF.InputSelectEmployee).on("change", (event) => {
-      kronos(HREF.DivNextAdminForm).html("");
-      kronos(HREF.DivAdminSubOption).html("");
-      if (event.target.value !== "new") {
-        kronos().request(
-          "POST",
-          "/Employe", {
-            type: "getOne",
-            id: event.target.value
-          },
-          (data) => {
-            localStorage.setItem("employee", JSON.stringify(data));
-            kronos(HREF.DivAdminOption).html(HTML.AdminFormOption);
+        kronos(HREF.InputSelectEmployee).on("change", (event) => {
+          kronos(HREF.DivNextAdminForm).html("");
+          kronos(HREF.DivAdminSubOption).html("");
+          console.log(event.target.value, event.target.value !== "Select Employee")
+          if (event.target.value !== "new" && event.target.value !== "Select Employee") {
+            kronos().request(
+              "POST",
+              "/Employe", {
+                type: "getOne",
+                _id: event.target.value
+              },
+              (data) => {
+                kronos(HREF.DivAdminOption).html(HTML.AdminFormOption(JSON.parse(localStorage.getItem("account"))));
+                kronos(HREF.InputSelectOption).on("change", (event) => {
+                  kronos(HREF.DivNextAdminForm).html("");
 
-            kronos(HREF.InputSelectOption).on("change", (event) => {
-              kronos(HREF.DivNextAdminForm).html("");
-              kronos(HREF.DivAdminSubOption).html("");
-
-              if (event.target.value === "EditEmp") {
-                kronos(HREF.DivNextAdminForm).html(
-                  HTML.TemplateFormEmployee({
-                    type: "edit",
-                    id: Number(JSON.parse(localStorage.getItem("employee")).id),
-                    value: JSON.parse(localStorage.getItem("employee")),
-                  })
-                );
-                kronos(HREF.ButtonDeleteEmployee).on("click", (event) => {
-                  kronos().request(
-                    "POST",
-                    "/Employe", {
-                      type: "remove",
-                      id: JSON.parse(localStorage.getItem("employee")).id,
-                    },
-                    (data) => {}
-                  );
-                  window.location.reload();
-                });
-              }
-
-              if (event.target.value === "NewWor") {
-                kronos(HREF.DivNextAdminForm).html(
-                  HTML.TemplateFormTimeWork({
-                    type: "new",
-                    id: Number(JSON.parse(localStorage.getItem("employee")).id),
-                    StartWeek: new Date(Number(localStorage.getItem("currentWeek"))),
-                  })
-                );
-                kronos("div#NextAdmin > form > input:nth-child(2)").on(
-                  "change",
-                  (event) => {
-                    event.target.value = "new";
-                  }
-                );
-
-                kronos(HREF.InputFormCheckAbsent).on("change", (event) => {
-                  kronos(HREF.InputFormTimeStart).attr("toggle", "disabled");
-                  kronos(HREF.InputFormTimeEnd).attr("toggle", "disabled");
-                });
-
-                kronos(HREF.InputFormDate).on("change", (event) => {
-                  kronos(HREF.InputFormStartWeek).value(
-                    String(
-                      getRangeWeek(new Date(event.target.value))[0].setHours(0)
-                    )
-                  );
-                });
-              }
-
-              if (event.target.value === "EditWor") {
-                kronos(HREF.DivAdminSubOption).html(HTML.AdminFormSubOption);
-                kronos().request(
-                  "POST",
-                  "/Horaire", {
-                    type: "get",
-                    subtype: "employe",
-                    week: Number(localStorage.getItem('currentWeek')),
-                    id: Number(JSON.parse(localStorage.getItem("employee")).id),
-                  },
-                  (data) => {
-                    data.forEach((elem) => {
-                      kronos(HREF.InputSelectSubOption).append(
-                        HTML.SelectOptionTimeWork(elem)
-                      );
-                    });
-
-                    kronos(HREF.InputSelectSubOption).on("change", (event) => {
-                      console.log("[ debug 1 ] - ", event)
+                  if (event.target.value === "EditEmp") {
+                    kronos(HREF.DivAdminSubOption).html("");
+                    kronos(HREF.DivNextAdminForm).html(
+                      HTML.TemplateFormEmployee({
+                        type: "edit",
+                        id: Number(JSON.parse(localStorage.getItem("employee")).id),
+                        value: JSON.parse(localStorage.getItem("employee")),
+                      })
+                    );
+                  
+                    kronos(HREF.ButtonDeleteForm).on("click", (event) => {
                       kronos().request(
                         "POST",
-                        "/Horaire", {
-                          type: "getOne",
-                          id: Number(event.target.value)
+                        "/Employe", {
+                          type: "remove",
+                          _id: JSON.parse(localStorage.getItem("employee"))._id,
+                          id: JSON.parse(localStorage.getItem("employee")).id,
                         },
-                        (data) => {
-                          kronos(HREF.DivNextAdminForm).html(
-                            HTML.TemplateFormTimeWork({
-                              type: "edit",
-                              id: Number(
-                                JSON.parse(localStorage.getItem("employee")).id
-                              ),
-                              value: data,
-                              StartWeek: new Date(Number(localStorage.getItem("currentWeek"))),
-                            })
-                          );
+                        (data) => {}
+                      );
+                      window.location.reload();
+                    });
+                  }
 
-                          kronos(HREF.InputFormDate).on("change", (event) => {
-                            kronos(HREF.InputFormStartWeek).value(
-                              String(
-                                getRangeWeek(
-                                  new Date(event.target.value)
-                                )[0].setHours(0)
-                              )
-                            );
-                          });
+                  if (event.target.value === "NewWor") {
+                    kronos(HREF.DivAdminSubOption).html("");
+                    kronos(HREF.DivNextAdminForm).html(
+                      HTML.TemplateFormTimeWork({
+                        type: "new",
+                        id: JSON.parse(localStorage.getItem("employee")).id,
+                        StartWeek: new Date(Number(localStorage.getItem("currentWeek"))),
+                      })
+                    );
+                    kronos("div#NextAdmin > form > input:nth-child(2)").on(
+                      "change",
+                      (event) => {
+                        event.target.value = "new";
+                      }
+                    );
 
-                          kronos(HREF.InputFormCheckAbsent).on(
-                            "change",
-                            (event) => {
-                              kronos(HREF.InputFormTimeStart).attr(
-                                "toggle",
-                                "disabled"
-                              );
-                              kronos(HREF.InputFormTimeEnd).attr(
-                                "toggle",
-                                "disabled"
-                              );
-                            }
-                          );
-                        }
+                    kronos(HREF.InputFormCheckAbsent).on("change", (event) => {
+                      kronos(HREF.InputFormTimeStart).attr("toggle", "disabled");
+                      kronos(HREF.InputFormTimeEnd).attr("toggle", "disabled");
+                    });
+
+                    kronos(HREF.InputFormDate).on("change", (event) => {
+                      kronos(HREF.InputFormStartWeek).value(
+                        String(
+                          getRangeWeek(new Date(event.target.value))[0].setHours(0)
+                        )
                       );
                     });
                   }
-                );
+
+                  if (event.target.value === "EditWor") {
+                    kronos(HREF.DivAdminSubOption).html(HTML.AdminFormSubOption);
+                    kronos().request(
+                      "POST",
+                      "/Horaire", {
+                        type: "get",
+                        subtype: "employe",
+                        week: Number(localStorage.getItem('currentWeek')),
+                        id: JSON.parse(localStorage.getItem("employee")).id,
+                      },
+                      (data) => {
+                        data.forEach((elem) => {
+                          kronos(HREF.InputSelectSubOption).append(
+                            HTML.SelectOptionTimeWork(elem)
+                          );
+                        });
+
+                        kronos(HREF.InputSelectSubOption).on("change", (event) => {
+                          kronos().request(
+                            "POST",
+                            "/Horaire", {
+                              type: "getOne",
+                              _id: event.target.value
+                            },
+                            (data) => {
+                              var extra = ""
+                              if (JSON.parse(localStorage.getItem("account")).permission === "Manager") extra = "Manager"
+                              else extra = "Administration"
+                              kronos(HREF.DivNextAdminForm).html(
+                                HTML.TemplateFormTimeWork({
+                                  type: "edit",
+                                  id: JSON.parse(localStorage.getItem("employee")).id,
+                                  value: data,
+                                  StartWeek: new Date(Number(localStorage.getItem("currentWeek"))),
+                                  permission: extra,
+                                })
+                              );
+
+                              kronos(HREF.InputFormDate).on("change", (event) => {
+                                kronos(HREF.InputFormStartWeek).value(
+                                  String(
+                                    getRangeWeek(
+                                      new Date(event.target.value)
+                                    )[0].setHours(0)
+                                  )
+                                );
+                              });
+
+                              kronos(HREF.InputFormCheckAbsent).on(
+                                "change",
+                                (event) => {
+                                  kronos(HREF.InputFormTimeStart).attr(
+                                    "toggle",
+                                    "disabled"
+                                  );
+                                  kronos(HREF.InputFormTimeEnd).attr(
+                                    "toggle",
+                                    "disabled"
+                                  );
+                                }
+                              );
+
+                              kronos(HREF.ButtonDeleteForm).on("click", (event) => {
+                                kronos().request(
+                                  "POST",
+                                  "/Horaire", {
+                                    type: "remove",
+                                    _id: data._id,
+                                  },
+                                  (data) => {}
+                                );
+                                window.location.reload();
+                              });
+                            }
+                          );
+                        });
+                      }
+                    );
+                  }
+                });
               }
-            });
+            );
+          } else if (event.target.value === "new") {
+            localStorage.removeItem("employee");
+            kronos(HREF.DivAdminOption).html("")
+            kronos(HREF.DivNextAdminForm).html(
+              HTML.TemplateFormEmployee({
+                type: "new"
+              })
+            );
           }
-        );
-      } else if (event.target.value === "new") {
-        localStorage.removeItem("employee");
-        kronos(HREF.DivNextAdminForm).html(
-          HTML.TemplateFormEmployee({
-            type: "new"
-          })
-        );
-      }
-    });
-  });
+        });
+    })
+  };
 
   // Create Line in Table (Name, ID, MaxHour, Time Hour, Abs)
   kronos().request("POST", "/Employe", {
@@ -350,7 +419,9 @@ kronos(() => {
     data.forEach((elem, index) => {
       kronos(HREF.BodyTable).append(HTML.TemplateLineTable(elem));
       EmployeTableLine[elem.id] = index;
+      EmployeNameId[elem.name] = elem.id;
       DataPreSortTable[elem.id] = {};
+      Employeid_id[elem.id] = elem._id;
     });
 
     kronos().request(
@@ -359,39 +430,37 @@ kronos(() => {
         type: "get",
         week: Number(localStorage.getItem("currentWeek")),
       },
-      (data) => {
+      (data, index) => {
         data.forEach((elem, index) => {
-          if (
-            Object.keys(DataPreSortTable[elem.EmployePlanning]).indexOf(
-              elem.DayDate
-            ) !== -1
-          ) {
+          if (Object.keys(DataPreSortTable[elem.EmployePlanning]).indexOf(elem.DayDate) !== -1) {
             DataPreSortTable[elem.EmployePlanning][elem.DayDate].push(elem);
           } else {
             DataPreSortTable[elem.EmployePlanning][elem.DayDate] = [elem];
           }
         });
 
-        console.log("[ DEBUG ] - ", DataPreSortTable)
-
         Object.keys(DataPreSortTable).forEach((elem, index) => {
           if (Object.keys(DataPreSortTable[elem]).length !== 0) {
+            var TotalHour = 0, countAbsent = 0;
             Object.keys(DataPreSortTable[elem]).forEach(
               (elemDate, indexDate) => {
+                DataPreSortTable[elem][elemDate].forEach((elemTotal, index) => {
+                  if (!elemTotal.Absent) {
+                    TotalHour += Number(TimeBetweenTwoTime(elemTotal.StartHour.replace(".", ":"), elemTotal.EndHour.replace(".", ":")));
+                  } else countAbsent++;
+                })
+
                 if (DataPreSortTable[elem][elemDate].length === 1) {
                   if (!DataPreSortTable[elem][elemDate][0].Absent) {
-                    kronos(HREF.TableSpecificLine({
-                      row: EmployeTableLine[elem] + 1,
-                      column: DATA.DayWeekDataTable[new Date(Number(elemDate)).getDay()]
-                    })).append(
+                    kronos(HREF.TableSpecificLine({row: EmployeTableLine[elem] + 2, column: DATA.DayWeekDataTable[new Date(Number(elemDate)).getDay()]})).append(
                       FUNCTION.ConvertTimeTable(
-                        DataPreSortTable[elem][elemDate][0].StartHour.replace(".", ":") + " - " + DataPreSortTable[elem][elemDate][0].EndHour.replace(".", ":"), DataPreSortTable[elem][elemDate][0]
+                        DataPreSortTable[elem][elemDate][0].StartHour.replace(".", ":") + " - " + DataPreSortTable[elem][elemDate][0].EndHour.replace(".", ":"), DataPreSortTable[elem][elemDate][0], SameWeek
                       )
                     );
                   } else {
                     kronos(
                       HREF.TableSpecificLine({
-                        row: EmployeTableLine[elem] + 1,
+                        row: EmployeTableLine[elem] + 2,
                         column: DATA.DayWeekDataTable[
                           new Date(Number(elemDate)).getDay()
                         ],
@@ -422,7 +491,7 @@ kronos(() => {
                       } else {
                         kronos(
                           HREF.TableSpecificLine({
-                            row: EmployeTableLine[elem] + 1,
+                            row: EmployeTableLine[elem] + 2,
                             column: DATA.DayWeekDataTable[
                               new Date(Number(elemDate)).getDay()
                             ],
@@ -434,24 +503,51 @@ kronos(() => {
                   if (AllHourDay !== "")
                     kronos(
                       HREF.TableSpecificLine({
-                        row: EmployeTableLine[elem] + 1,
+                        row: EmployeTableLine[elem] + 2,
                         column: DATA.DayWeekDataTable[
                           new Date(Number(elemDate)).getDay()
                         ],
                       })
-                    ).html(FUNCTION.ConvertTimeTable(AllHourDay, AllHourId));
+                    ).html(FUNCTION.ConvertTimeTable(AllHourDay, AllHourId, SameWeek));
                 }
               }
             );
+
+            var MaxHour = Number(kronos(HREF.SpecificColumnTable(10))[EmployeTableLine[elem]+2].innerHTML.replace(" / ", ""));
+
+            if (countAbsent == 7) TotalHour = "Abs";
+
+            if (TotalHour == MaxHour) {
+              kronos(HREF.SpecificColumnTable(10))[EmployeTableLine[elem]+2].classList.add("text-warning");
+            } else if (TotalHour < MaxHour) {
+              kronos(HREF.SpecificColumnTable(10))[EmployeTableLine[elem]+2].classList.add("text-success");
+            } else if (TotalHour != "Abs") {
+              kronos(HREF.SpecificColumnTable(10))[EmployeTableLine[elem]+2].classList.add("text-danger");
+            }
+
+            kronos(HREF.SpecificColumnTable(10))[EmployeTableLine[elem]+2].innerHTML = `${TotalHour} ${kronos(HREF.SpecificColumnTable(10))[EmployeTableLine[elem]+2].innerHTML}`
           }
         });
+
+        kronos(HREF.PTotalEmpWork).html(`${kronos(HREF.AllPTextWarning).length} employée sur ${Object.keys(DataPreSortTable).length} actif(s)`);
+        var ListWorkEmp = [];
+
+        (kronos(HREF.AllPTextWarning)).forEach((elem, index) => {
+          elem = elem.parentElement.parentElement.children[1].innerHTML;
+          if (ListWorkEmp.indexOf(elem) == -1) ListWorkEmp.push(elem)
+        });
+
+        kronos(HREF.PTotalEmpWork).attr("add", "title", ListWorkEmp.join(", "));
+        ReloadTooltips();
 
         kronos(HREF.RowTableCard).forEach((elem) => {
           elem.addEventListener("click", (event) => {
             kronos("." + HREF.AnimationArrow).class("remove", HREF.AnimationArrow);
+            kronos(HREF.BtnOptionEmploye).attr("remove", "disabled");
+            kronos(HREF.DivOptionEmploye).html("");
 
             var FullName = "",
-              id = "";
+              id = "";            
 
             var HourMonday = "",
               HourTuesday = "",
@@ -459,7 +555,8 @@ kronos(() => {
               HourThursday = "",
               HourFriday = "",
               HourSaturday = "",
-              HourSunday = "";
+              HourSunday = "",
+              TotalHour = "";
 
             if (event.target.tagName == "TD" || event.target.tagName == "TH") {
               ({
@@ -471,8 +568,9 @@ kronos(() => {
                 HourThursday,
                 HourFriday,
                 HourSaturday,
-                HourSunday
-              } = GetDataTable(FullName, id, HourMonday, HourTuesday, HourWednesday, HourThursday, HourFriday, HourSaturday, HourSunday, event.path[1]));
+                HourSunday,
+                TotalHour
+              } = GetDataTable(FullName, id, HourMonday, HourTuesday, HourWednesday, HourThursday, HourFriday, HourSaturday, HourSunday, TotalHour, event.path[1]));
             } else if (event.target.tagName == "P" || event.target.tagName == "HR") {
               ({
                 FullName,
@@ -483,8 +581,9 @@ kronos(() => {
                 HourThursday,
                 HourFriday,
                 HourSaturday,
-                HourSunday
-              } = GetDataTable(FullName, id, HourMonday, HourTuesday, HourWednesday, HourThursday, HourFriday, HourSaturday, HourSunday, event.path[2]));
+                HourSunday,
+                TotalHour
+              } = GetDataTable(FullName, id, HourMonday, HourTuesday, HourWednesday, HourThursday, HourFriday, HourSaturday, HourSunday, TotalHour, event.path[2]));
             } else if (event.target.tagName == "TR") {
               ({
                 FullName,
@@ -495,35 +594,82 @@ kronos(() => {
                 HourThursday,
                 HourFriday,
                 HourSaturday,
-                HourSunday
-              } = GetDataTable(FullName, id, HourMonday, HourTuesday, HourWednesday, HourThursday, HourFriday, HourSaturday, HourSunday, event.target));
+                HourSunday,
+                TotalHour
+              } = GetDataTable(FullName, id, HourMonday, HourTuesday, HourWednesday, HourThursday, HourFriday, HourSaturday, HourSunday, TotalHour, event.target));
             }
+            
+            kronos().request(
+              "POST",
+              "/Employe", {
+                type: "getOne",
+                _id: Employeid_id[Number(id)],
+              },
+              (data) => {
+                data = data[0]
+                data.TotalHour = TotalHour;
+                localStorage.setItem("employee", JSON.stringify(data))
+              }
+            )
 
-            if (Boolean(localStorage.getItem("ADMIN"))) {
+            if (JSON.parse(localStorage.getItem("account")).permission === "Administration") {
               kronos(HREF.InputSelectEmployeeOption).attr("remove", "selected");
-              kronos(HREF.SelectSpecificEmployee(id)).attr("add", "selected", "true");
+              kronos(HREF.SelectSpecificEmployee(Employeid_id[id])).attr("add", "selected", "true");
               SimulateEvent(kronos(HREF.InputSelectEmployee)[0]);
 
-              if (!(event.target.tagName == "P")) {
+              if (event.target.tagName == "TD") {
+                setTimeout(() => {
+                  kronos(HREF.InputSelectOptionOption).attr("remove", "selected");
+                  kronos(HREF.SelectSpecificOption("NewWor")).attr("add", "selected", "true");
+                  SimulateEvent(kronos(HREF.InputSelectOption)[0]);
+                  kronos(HREF.InputSelectOption)[0].scrollIntoView(true);
+                  setTimeout(() => {
+                    kronos(HREF.InputFormDate).value(`${new Date(new Date(Number(localStorage.getItem("currentWeek"))).setDate(new Date(Number(localStorage.getItem("currentWeek"))).getDate()+(Number(event.target.cellIndex)-2))).FormatYMD()}`)
+                  }, 100);
+                }, 100);
+              } else if (!(event.target.tagName == "P")) {
                 setTimeout(() => {
                   kronos(HREF.InputSelectOptionOption).attr("remove", "selected");
                   kronos(HREF.SelectSpecificOption("EditEmp")).attr("add", "selected", "true");
                   SimulateEvent(kronos(HREF.InputSelectOption)[0]);
+                  kronos(HREF.InputSelectOption)[0].scrollIntoView(true);
                 }, 100);
               } else {
-                console.log("[ Debug ] - ", event)
                 setTimeout(() => {
                   kronos(HREF.InputSelectOptionOption).attr("remove", "selected");
                   kronos(HREF.SelectSpecificOption("EditWor")).attr("add", "selected", "true");
                   SimulateEvent(kronos(HREF.InputSelectOption)[0]);
                   setTimeout(() => {
                     kronos(HREF.InputSelectSubOptionOption).attr("remove", "selected");
-                    kronos(HREF.SelectSpecificSubOption(event.target.classList[0].replace("Time-", ""))).attr("add", "selected", "true");
+                    kronos(HREF.SelectSpecificSubOption(event.target.classList[0].replaceAll("Time-", ""))).attr("add", "selected", "true");
                     SimulateEvent(kronos(HREF.InputSelectSubOption)[0]);
+                    kronos(HREF.InputSelectSubOption)[0].scrollIntoView(true);
                   }, 100);
                 }, 100);
               }
-            }
+            } else if (event.target.classList.contains("text-warning") && JSON.parse(localStorage.getItem("account")).permission === "Manager") {
+              kronos(HREF.InputSelectEmployeeOption).attr("remove", "selected");
+              kronos(HREF.SelectSpecificEmployee(Employeid_id[id])).attr("add", "selected", "true");
+              SimulateEvent(kronos(HREF.InputSelectEmployee)[0]);
+
+              setTimeout(() => {
+                kronos(HREF.InputSelectOptionOption).attr("remove", "selected");
+                kronos(HREF.SelectSpecificOption("EditWor")).attr("add", "selected", "true");
+                SimulateEvent(kronos(HREF.InputSelectOption)[0]);
+                setTimeout(() => {
+                  kronos(HREF.InputSelectSubOptionOption).attr("remove", "selected");
+                  console.log(event)
+                  kronos(HREF.SelectSpecificSubOption(event.target.classList[0].replaceAll("Time-", ""))).attr("add", "selected", "true");
+                  SimulateEvent(kronos(HREF.InputSelectSubOption)[0]);
+                  kronos(HREF.InputSelectSubOption)[0].scrollIntoView(true);
+                }, 100);
+              }, 100);
+            } else if (JSON.parse(localStorage.getItem("account")).permission === "Manager") {
+              kronos(HREF.InputSelectEmployeeOption).attr("remove", "selected");
+              kronos(HREF.SelectSpecificOptionEmploye(1)).attr("add", "selected", "true");
+              SimulateEvent(kronos(HREF.InputSelectEmployee)[0]);
+              kronos(HREF.DivAdminOption).html("");
+            };
 
             var ArrayHourDay = [HourSunday, HourMonday, HourTuesday, HourWednesday, HourThursday, HourFriday, HourSaturday]
 
@@ -629,4 +775,43 @@ kronos(() => {
       }
     );
   });
+
+  kronos(HREF.BtnOptionEmploye).on('click', (event) => {
+    kronos(HREF.DivOptionEmploye).html(HTML.OptionEmploye);
+    var dataEmp = JSON.parse(localStorage.getItem("employee"));
+
+    console.log(event)
+    //kronos(HREF.DivOptionEmploye).html(HTML.)
+    if (dataEmp.TotalHour == "Abs") dataEmp.TotalHour = Number(dataEmp.MaxHour) - 1;
+    kronos(HREF.BtnSalaireEmploye).attr("add", "title", `≈ ${String((dataEmp.TotalHour * 10.15).round()).replace(".", ",")} €<br/><em>Base de 10.15 €/Heure</em>`);
+    ReloadTooltips();
+  });
+
+  var InputSearchChange = false;
+
+  function Search() {
+    var value = kronos(HREF.InputSearchBar).value();
+    if (value !== "") {
+      if (!isNaN(Number(value))) {
+        console.log(EmployeTableLine, EmployeTableLine[Number(value)], HREF.TableSpecificLine({row: EmployeTableLine[Number(value)], column: 1}), kronos(HREF.TableSpecificLine({row: EmployeTableLine[Number(value)]+2})));
+        kronos(HREF.TableSpecificLine({row: EmployeTableLine[Number(value)]++}))[0].scrollIntoView(true);
+      } else {
+        console.log(EmployeNameId[value], value)
+        if (Object.keys(EmployeNameId).indexOf(value) !== 1) kronos(HREF.TableSpecificLine({row: EmployeTableLine[EmployeNameId[value]]++}))[0].scrollIntoView(true);
+      }
+    }
+  }
+
+  kronos(HREF.InputSearchBar).on('click', (event) => {
+    InputSearchChange = true;
+  });
+
+  document.addEventListener('keypress', (event) => {
+    if (event.key === "Enter" && InputSearchChange) Search();
+  })
+
+  kronos(HREF.BtnSearchBar).on('click', (event) => {
+    Search();
+  })
 });
+
