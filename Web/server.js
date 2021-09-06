@@ -57,22 +57,26 @@ app.use("/assets", express.static(path.join(__dirname, "public")));
 app.use("/assets", express.static(path.join(__dirname, "node_modules")));
 
 app.get("/", (_req, res) => {
-  res.sendFile(path.join(__dirname + "/index.html"));
+  res.sendFile(path.join(__dirname + "/public/html/index.html"));
 });
 
 app.get("https://192.168.1.50/", (_req, _res) => {
-  res.sendFile(path.join(__dirname + "/index.html"));
+  res.sendFile(path.join(__dirname + "/public/html/index.html"));
 });
 
 app.get("/Error", (_req, _res) => {
-  _res.sendFile(path.join(__dirname + "/Error.html"));
-})
+  _res.sendFile(path.join(__dirname + "/public/html/Error.html"));
+});
+
+app.get("/plannings", (_req, _res) => {
+  _res.sendFile(path.join(__dirname + "/public/html/plannings.html"))
+});
 
 async function dev() {
   try {
     await client.connect();
-    const db = client.db('PlanningsMcDonalds'), collection = db.collection('plannings');
-    await collection.updateMany({}, { $set: {Role: ""} }, { upsert: true });
+    const db = client.db('PlanningsMcDonalds'), collection = db.collection('employe');
+    await collection.updateMany({}, { $set: {pays: "fr", restaurant: 0} }, { upsert: true });
   } catch (error) {
     console.error("[ Error ] - User Redirect");
     fs.appendFileSync("./LogServer.log", `${new Date().getTime()} - ${error}\n`)
@@ -80,7 +84,7 @@ async function dev() {
   }
 }
 
-// dev()
+//dev()
 
 app.route("/Horaire").post(async (_req, res) => {
   try {
@@ -95,8 +99,10 @@ app.route("/Horaire").post(async (_req, res) => {
         body.Absent = true;
         body.DayDate = String(new Date(body.DayDate).getTime());
         body.EmployePlanning = Number(body.id);
+        body.Line = body.Line || "";
       } else {
         body.Absent = false;
+        body.Line = "";
         body.Role = "";
         body.DayDate = String(new Date(body.DayDate).getTime());
         body.StartHour = body.StartHour.replace(":", ".");
@@ -106,7 +112,7 @@ app.route("/Horaire").post(async (_req, res) => {
       delete body.id;
       console.log("[ Horaire (New) ] (body) - ", body)
       await collection.insertOne(body);
-      res.redirect("/")
+      res.redirect("/plannings")
     }
   
     if (body.type === "edit") {
@@ -128,23 +134,30 @@ app.route("/Horaire").post(async (_req, res) => {
       delete body.id
       console.log("[ Horaire (Edit) ] (body) - ", body)
       await collection.updateOne({"_id" : ObjectId(_id)}, { $set: body }, { upsert: true });
-      res.redirect("/")
+      res.redirect("/plannings")
     }
   
     if (body.type === "get") {
       if (Object.keys(body).indexOf("subtype") !== -1) {
         if (body.subtype === "employe") {
           const cursor = await collection.find({ StartWeek: String(body.week), EmployePlanning: Number(body.id) }).toArray();
-          console.log(cursor)
 
           if (cursor.length === 0) {console.log("No documents found!"); res.send([])}
           else res.send(cursor);
         }
       } else {
-        const cursor = await collection.find({ StartWeek: String(body.week) }).toArray();
+        var FullData = [], end = false;
+        await (body.Employe).forEach(async (elem, index) => {
+          const cursor = await collection.find({ StartWeek: String(body.week), EmployePlanning: Number(elem) }).toArray();
+          console.log("Data : ", cursor);
+          cursor.forEach(elem => FullData.push(elem));
 
-        if (cursor.length === 0) {console.log("No documents found!"); res.send([])}
-        else res.send(cursor);
+          if ((body.Employe.length-1) === index) {
+            if (FullData.length === 0) {console.log("No documents found!"); res.send([])}
+            else res.send(FullData);
+          }
+        });
+        
       }
     }
   
@@ -159,7 +172,7 @@ app.route("/Horaire").post(async (_req, res) => {
       } else {
         console.log("No documents matched the query. Deleted 0 documents.");
       }
-      res.redirect("/");
+      res.redirect("/plannings");
     }
   } catch (error) {
     console.error("[ Error ] - User Redirect");
@@ -181,7 +194,7 @@ app.route("/Employe").post(async (_req, res) => {
       body.id = Number(body.id);
       body.MaxHour = Number(body.MaxHour);
       await collection.insertOne(body);
-      res.redirect("/")
+      res.redirect("/plannings")
     }
   
     if (body.type === "edit") {
@@ -191,11 +204,11 @@ app.route("/Employe").post(async (_req, res) => {
       body.id = Number(body.id)
       body.MaxHour = Number(body.MaxHour)
       await collection.updateOne({"_id" : ObjectId(_id)}, { $set: body }, { upsert: true });
-      res.redirect("/");
+      res.redirect("/plannings");
     }
   
     if (body.type === "get") {
-      const cursor = await collection.find().sort({ id: 1 }).toArray();
+      const cursor = await collection.find({ pays: body.pays, restaurant: Number(body.restaurant) }).sort({ id: 1 }).toArray();
 
       if (cursor.length === 0) {console.log("No documents found!"); res.send([])}
       else res.send(cursor);
@@ -214,13 +227,71 @@ app.route("/Employe").post(async (_req, res) => {
       } else {
         console.log("No documents matched the query. Deleted 0 documents.");
       }
-      res.redirect("/");
+      res.redirect("/plannings");
     }
   } catch (error) {
     console.error("[ Error ] - User Redirect");
     fs.appendFileSync("./LogServer.log", `${new Date().getTime()} - ${error}\n`)
     res.redirect("/Error")
   }
+});
+
+app.route("/Geo").post(async (_req, res) => {
+  try {
+    await client.connect();
+
+    const db = client.db('PlanningsMcDonalds'), collection = db.collection('World'), collection2 = db.collection('Departement'), collection3 = db.collection('Restaurant');
+    var body = _req.body;
+    console.log("[ Geo ] (body) - ", body)
+
+    if (body.type === "get") {
+      if (Object.keys(body).indexOf("subtype") !== -1) {
+        if (body.subtype === "Restaurant") {
+          const cursor3 = await collection3.find({pays: body.pays, departement: Number(body.departement)}).sort({ville: 1 }).toArray();
+
+          if (cursor3.length === 0) {console.log("No documents found!"); res.send([])}
+          else res.send({Restaurant: cursor3});
+        }
+      } else {
+        const cursor = await collection.find().sort({ id: 1 }).toArray();
+        const cursor2 = await collection2.find().sort({code: 1 }).toArray();
+  
+        if (cursor.length === 0 && cursor2.length === 0 ) {console.log("No documents found!"); res.send([])}
+        else res.send({Pays: cursor, Departement: cursor2});
+      }
+    }
+  } catch (error) {
+    console.error("[ Error ] - User Redirect");
+    fs.appendFileSync("./LogServer.log", `${new Date().getTime()} - ${error}\n`)
+    res.redirect("/Error")
+  }
+});
+
+app.route("/Connection").post(async (_req, res) => {
+  try {
+    await client.connect();
+
+    const db = client.db('PlanningsMcDonalds'), collection = db.collection('user');
+    var body = _req.body;
+    console.log("[ User ] (body) - ", body)
+    const cursor = await collection.findOne({ username: String(body.username) });
+
+    console.log("Value cursor : ", cursor);
+
+    if (cursor === null) {console.log("No documents found!"); res.send(["Error Connection"])}
+    else if (cursor !== null) {
+      if (cursor.password === String(body.password) && cursor.permission === String(body.permission)) res.send([cursor])
+    };
+  } catch (error) {
+    console.error("[ Error ] - User Redirect");
+    fs.appendFileSync("./LogServer.log", `${new Date().getTime()} - ${error}\n`)
+    res.redirect("/Error")
+  }
+});
+
+app.all(/.*/, (_req, _res) => {
+  console.log("[ Warning URL ] (_req) - ", _req.url);
+  _res.redirect("/Error");
 });
 
 https

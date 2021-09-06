@@ -39,7 +39,261 @@ const DATA = {
     KDU: "Double UHC",
     KCF: "Cuisson frit",
     KCV: "Cuisson viande",
-    KDC: "Double cuisson"
+    KDC: "Double cuisson",
+    CK: "Close Cuisine",
+    CL: "Close Lobby",
+    CC: "Close Comptoir"
+  },
+  Pays: {
+    "IM": "Île de Man",
+    "HR": "Croatie",
+    "GW": "Guinée-Bissau",
+    "IN": "Inde",
+    "KE": "Kenya",
+    "LA": "Laos",
+    "IO": "Territoire britannique de l'océan Indien",
+    "HT": "Haïti",
+    "LB": "Liban",
+    "GY": "Guyana",
+    "KG": "Kirghizistan",
+    "HU": "Hongrie",
+    "LC": "Sainte-Lucie",
+    "IQ": "Irak",
+    "KH": "Cambodge",
+    "JM": "Jamaïque",
+    "IR": "Iran",
+    "KI": "Kiribati",
+    "IS": "Islande",
+    "MA": "Maroc",
+    "JO": "Jordanie",
+    "IT": "Italie",
+    "JP": "Japon",
+    "MC": "Monaco",
+    "KM": "Comores",
+    "MD": "Moldavie",
+    "LI": "Liechtenstein",
+    "KN": "Saint-Christophe-et-Niévès",
+    "ME": "Monténégro",
+    "NA": "Namibie",
+    "MF": "Saint-Martin",
+    "LK": "Sri Lanka",
+    "KP": "Corée du Nord",
+    "MG": "Madagascar",
+    "NC": "Nouvelle-Calédonie",
+    "MH": "Îles Marshall",
+    "KR": "Corée du Sud",
+    "NE": "Niger",
+    "NF": "Île Norfolk",
+    "MK": "Macédoine",
+    "NG": "Nigéria",
+    "ML": "Mali",
+    "MM": "Myanmar (Birmanie)",
+    "LR": "Libéria",
+    "NI": "Nicaragua",
+    "KW": "Koweït",
+    "MN": "Mongolie",
+    "LS": "Lesotho",
+    "PA": "Panamá",
+    "MO": "Macau",
+    "LT": "Lituanie",
+    "KY": "Îles Caïmans",
+    "MP": "Îles Mariannes du Nord",
+    "LU": "Luxembourg",
+    "NL": "Pays-Bas",
+    "KZ": "Kazakhstan",
+    "MQ": "Martinique",
+    "LV": "Lettonie",
+    "MR": "Mauritanie",
+    "PE": "Pérou",
+    "MS": "Montserrat",
+    "QA": "Qatar",
+    "NO": "Norvège",
+    "PF": "Tahïti (Polynésie française)",
+    "MT": "Malte",
+    "LY": "Libye",
+    "NP": "Népal",
+    "PG": "Papouasie-Nouvelle-Guinée",
+    "MU": "Maurice",
+    "PH": "Philippines",
+    "MV": "Maldives",
+    "OM": "Oman",
+    "NR": "Nauru",
+    "MW": "Malawi",
+    "MX": "Mexico",
+    "PK": "Pakistan",
+    "MY": "Malaisie",
+    "NU": "Niue",
+    "PL": "Pologne",
+    "MZ": "Mozambique",
+    "PM": "Saint-Pierre-et-Miquelon",
+    "PN": "Îles Pitcairn",
+    "RE": "La Réunion",
+    "SA": "Arabie saoudite",
+    "SB": "Îles Salomon",
+    "NZ": "Nouvelle-Zélande",
+    "SC": "Seychelles",
+    "SD": "Soudan",
+    "PR": "Porto Rico",
+    "SE": "Suède",
+    "PS": "Territoires palestiniens occupés",
+    "PT": "Portugal",
+    "SG": "Singapour",
+    "TC": "Îles Turques-et-Caïques",
+    "SH": "Sainte-Hélène",
+    "TD": "Tchad",
+    "SI": "Slovénie",
+    "PW": "Palaos",
+    "SJ": "Svalbard et Jan Mayen",
+    "UA": "Ukraine",
+    "RO": "Roumanie",
+    "TF": "Terres australes et antarctiques françaises",
+    "SK": "Slovaquie",
+    "PY": "Paraguay",
+    "TG": "Togo",
+    "SL": "Sierra Leone",
+    "TH": "Thaïlande",
+    "SM": "Saint-Marin",
+    "SN": "Sénégal",
+    "RS": "Serbie (Yougoslavie)",
+    "TJ": "Tadjikistan",
+    "VA": "Cité du Vatican",
+    "SO": "Somalie",
+    "TK": "Tokelau",
+    "UG": "Ouganda",
+    "RU": "Russie",
+    "TL": "Timor oriental",
+    "VC": "Saint-Vincent-et-les-Grenadines",
+    "TM": "Turkménistan",
+    "SR": "Suriname",
+    "RW": "Rwanda",
+    "TN": "Tunisie",
+    "VE": "Venezuela",
+    "TO": "Tonga",
+    "ST": "Sao Tomé-et-Principe",
+    "VG": "Îles Vierges britanniques",
+    "SV": "Salvador",
+    "UM": "Îles mineures éloignées des États-Unis",
+    "TR": "Turquie",
+    "VI": "Îles Vierges(US)",
+    "WF": "Wallis-et-Futuna",
+    "TT": "Trinité-et-Tobago",
+    "SY": "Syrie",
+    "SZ": "Swaziland",
+    "TV": "Tuvalu",
+    "TW": "Taïwan",
+    "VN": "Viêt Nam",
+    "US": "États-Unis(USA)",
+    "TZ": "Tanzanie",
+    "YE": "Yémen",
+    "ZA": "Afrique du Sud",
+    "XK": "République du Kosovo",
+    "UY": "Uruguay",
+    "VU": "Vanuatu",
+    "UZ": "Ouzbékistan",
+    "WS": "Samoa",
+    "ZM": "Zambie",
+    "AC": "Île de l'Ascension",
+    "AD": "Andorre",
+    "YT": "Mayotte",
+    "AE": "Émirats arabes unis",
+    "YU": "Serbia and Montenegro",
+    "BA": "Serbie-et-Monténégro",
+    "AF": "Afghanistan",
+    "BB": "Barbade",
+    "AG": "Antigua-et-Barbuda",
+    "BD": "Bangladesh",
+    "AI": "Anguilla",
+    "BE": "Belgique",
+    "CA": "Canada",
+    "BF": "Burkina Faso",
+    "BG": "Bulgarie",
+    "ZW": "Zimbabwe",
+    "AL": "Albanie",
+    "CC": "Îles Cocos",
+    "BH": "Bahreïn",
+    "AM": "Arménie",
+    "CD": "République démocratique du Congo",
+    "BI": "Burundi",
+    "AN": "Antilles néerlandaises",
+    "BJ": "Bénin",
+    "AO": "Angola",
+    "CF": "République centrafricaine",
+    "CG": "République du Congo",
+    "AQ": "Antarctique",
+    "CH": "Suisse",
+    "BM": "Bermudes",
+    "AR": "Argentine",
+    "CI": "Côte d'Ivoire",
+    "BN": "Brunei Darussalam",
+    "DE": "Allemagne",
+    "AS": "Samoa américaines",
+    "BO": "Bolivie",
+    "AT": "Autriche",
+    "CK": "Îles Cook",
+    "AU": "Australie",
+    "CL": "Chili",
+    "EC": "Équateur",
+    "CM": "Cameroun",
+    "BR": "Brésil",
+    "AW": "Aruba",
+    "CN": "Chine",
+    "EE": "Estonie",
+    "BS": "Bahamas",
+    "DJ": "Djibouti",
+    "AX": "Åland",
+    "CO": "Colombie",
+    "BT": "Bhoutan",
+    "DK": "Danemark",
+    "EG": "Égypte",
+    "AZ": "Azerbaïdjan",
+    "EH": "Sahara occidental",
+    "BV": "Île Bouvet",
+    "DM": "Dominique",
+    "CR": "Costa Rica",
+    "BW": "Botswana",
+    "GA": "Gabon",
+    "DO": "République dominicaine",
+    "BY": "Biélorussie",
+    "GB": "Royaume-Uni",
+    "CU": "Cuba",
+    "BZ": "Bélize",
+    "CV": "Cap-Vert",
+    "GD": "Grenade",
+    "FI": "Finlande",
+    "GE": "Géorgie",
+    "FJ": "Fidji",
+    "CX": "Île Christmas",
+    "GF": "Guyane",
+    "FK": "Îles Malouines",
+    "CY": "Chypre",
+    "GG": "Guernesey",
+    "CZ": "République tchèque",
+    "GH": "Ghana",
+    "FM": "Micronésie",
+    "ER": "Érythrée",
+    "GI": "Gibraltar",
+    "ES": "Espagne",
+    "FO": "Îles Féroé",
+    "ET": "Éthiopie",
+    "GL": "Groenland",
+    "DZ": "Algérie",
+    "GM": "Gambie",
+    "ID": "Indonésie",
+    "FR": "France",
+    "GN": "Guinée",
+    "IE": "Irlande",
+    "HK": "Hong Kong",
+    "GP": "Guadeloupe",
+    "GQ": "Guinée équatoriale",
+    "HM": "Îles Heard-et-MacDonald",
+    "GR": "Grèce",
+    "HN": "Honduras",
+    "JE": "Jersey",
+    "GS": "Géorgie du Sud-et-les Îles Sandwich du Sud",
+    "FX": "France métropolitaine",
+    "GT": "Guatemala",
+    "GU": "Guam",
+    "IL": "Israël"
   }
 };
 
@@ -249,12 +503,10 @@ const HTML = {
   },
   InputRoleEmployee: (data) => { 
     var Option = "", extra = false;
-    console.log(data, extra)
 
     if (data.Role !== "" && Object.keys(DATA.Role).indexOf(data.Role) !== -1) extra = true;
     
     Object.keys(DATA.Role).forEach((elem, index) => {
-      console.log(elem, index, DATA.Role[Object.keys(DATA.Role)[index]]);
       if (extra && elem === data.Role) Option += `<option value="${elem}" selected>${DATA.Role[Object.keys(DATA.Role)[index]]}</option>`
       else Option += `<option value="${elem}">${DATA.Role[Object.keys(DATA.Role)[index]]}</option>`
     });
@@ -267,6 +519,11 @@ const HTML = {
     </select>
     <div class="invalid-feedback">
       ${ErrorValidationForm}
+    </div>
+    <span class="input-group-text">Ligne</span>
+    <input type="text" class="form-control" name="line" placeholder="Ligne" value="${data.line === undefined ? "" : data.line}" ${data.line === undefined ? "disabled" : ""}>
+    <div class="invalid-feedback">
+        ${ErrorValidationForm}
     </div>
     `
   },
@@ -453,9 +710,90 @@ const HTML = {
     }
   },
   OptionEmploye: `
-  <button class="btn btn-outline-dark border-0"><i class="bi bi-clipboard"></i></button>
+  <button class="btn btn-outline-dark border-0" data-bs-toggle="tooltip" tabindex="0" data-bs-placement="bottom" data-bs-html="true" title=""><i class="bi bi-clipboard"></i></button>
   <button class="btn btn-outline-warning border-0" data-bs-toggle="tooltip" tabindex="0" data-bs-placement="bottom" data-bs-html="true" title=""><i class="bi bi-cash-coin"></i></button>
-  `
+  `,
+  TemplateFormMainPage: (data) => {
+    var OptionPays = "";
+
+    data.World.forEach((elem, index) => {
+      OptionPays += `
+      <option value="${elem.alpha2}">${elem.alpha2.toUpperCase()} | ${elem.name}</option>`;
+    });
+
+    return `
+    <div class="row m-1">
+      <div class="col input-group">
+        <span class="input-group-text">Pays</span>
+        <select name="Pays" class="form-select rounded-end">
+          <option selected disabled>Sélectionner un pays</option>
+          ${OptionPays}
+        </select>
+        <div class="invalid-feedback">
+          test
+        </div>
+      </div>
+    </div>
+    <div class="row m-1 d-none">
+      <div class="col input-group">
+        <span class="input-group-text">Département</span>
+        <select name="Departement" class="form-select rounded-end">
+          
+        </select>
+        <div class="invalid-feedback">
+          test
+        </div>
+      </div>
+    </div>
+    <div class="row m-1 d-none">
+      <div class="col input-group">
+        <span class="input-group-text">Restaurant</span>
+        <select name="Restaurant" class="form-select rounded-end">
+        </select>
+        <div class="invalid-feedback">
+          test
+        </div>
+      </div>
+    </div>
+    <div class="d-flex flex-row align-content-between m-auto my-2 d-none">
+      <button class="btn btn-outline-warning mx-3">Employee</button>
+      <button class="btn btn-outline-secondary mx-3">Manager</button>
+      <button class="btn btn-outline-success mx-3">Administration</button>
+    </div>
+    `;
+  },
+  OptionDepartement: (data) => {
+    var Option = "<option selected disabled>Sélectionner votre département</option>";
+    data.Departement.forEach(elem => {
+      if (data.pays === elem.pays) {
+        Option += `
+        <option value="${elem.code}">${elem.code} | ${elem.name}</option>
+        `;
+      }
+    });
+    return Option;
+  },
+  OptionRestaurant: (data) => {
+    var DataPreSort = {}, Option = "<option selected disabled>Sélectionner votre restaurant</option>";
+
+    data.forEach((elem, index) => {
+      if (Object.keys(DataPreSort).indexOf(elem.ville) === -1) {
+        DataPreSort[elem.ville] = [elem];
+      } else {
+        DataPreSort[elem.ville].push(elem);
+      }
+    });
+
+    Object.keys(DataPreSort).forEach((elem, index) => {
+      Option += `<optgroup label="${elem}">`
+      DataPreSort[elem].forEach((elem, index) => {
+        Option += `<option value="${elem.id}">${elem.name}</option>`
+      })
+      Option += "</optgroup>"
+    });
+
+    return Option;
+  }
 };
 
 const HREF = {
@@ -527,7 +865,21 @@ const HREF = {
   BtnOptionEmploye: "#BtnOptionEmploye",
   DivOptionEmploye: "#OptionEmploye",
   BtnSalaireEmploye: "#OptionEmploye > button.btn.btn-outline-warning.border-0",
+  BtnRoleEmploye: "#OptionEmploye > button.btn.btn-outline-dark.border-0",
   RoleEmployeeWorkTimeDiv: "#NextAdmin > form > div:nth-child(6) > div",
+  InputSelectRole: "#NextAdmin > form > div:nth-child(6) > div > select",
   BtnSearchBar: "body > div.sticky-top.bg-light > nav > div > div.d-flex > button.btn.LogoMcDo.me-4",
   InputSearchBar: "body > div.sticky-top.bg-light > nav > div > div.d-flex > input",
+  InputLineWork: "#NextAdmin > form > div:nth-child(6) > div > input",
+  MainPageBtn: "body > div > div:nth-child(2) > div.d-flex.flex-row.align-content-between.m-auto.my-2 button",
+  MainPageDivBtn: "body > div > div:nth-child(2) > div.d-flex.flex-row.align-content-between.m-auto.my-2",
+  DivMainPageForm: "body > div > div:nth-child(2)",
+  SelectMainPage: "body > div > div:nth-child(2) div div select",
+  SelectDepartement: "body > div > div:nth-child(2) > div:nth-child(2) > div > select",
+  divSpecificMainPage: (data) => {return `body > div > div:nth-child(2) > div:nth-child(${data})`},
+  SelectSpecificMainPage: (data) => {return `body > div > div:nth-child(2) > div:nth-child(${data}) > div > select`},
+  DivConnectionLandingPage: "#DivConnection",
+  BtnConnectionLandingPage: "#DivConnection > div:nth-child(3) > button",
+  IptUsername: "#DivConnection > div:nth-child(1) > div > input",
+  IptPassword: "#DivConnection > div:nth-child(2) > div > input",
 };

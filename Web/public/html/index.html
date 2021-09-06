@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mc Donald's plannings for employee</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous" />
+
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <script src="/assets/framework/Kronos.min.js"></script>
+  <script src="/assets/js/constant.js"></script>
+  <script src="/assets/js/index.js"></script>
+</head>
+
+<body class="container-fluid w-100 h-100 bg-dark bg-gradient">
+  <div class="position-absolute top-50 start-50 translate-middle d-flex flex-column">
+    <div class="d-flex flex-column m-auto my-2">
+      <img src="/assets/image/LogoMcDo.png" alt="" class="rounded m-auto" />
+
+      <p class="fs-5 text-center text-white-50 m-auto">Mc Donald's plannings</p>
+    </div>
+    <div class="d-flex flex-column align-content-between m-auto my-2">
+    </div>
+    <div id="DivConnection" class="d-none d-flex flex-column align-content-between m-auto my-2">
+      <div class="row m-1">
+        <div class="input-group mb-3">
+          <label for="username" class="input-group-text">Nom d'utilisateur </label>
+          <input type="text" placeholder="username" class="form-control" name="username" required>
+        </div>
+      </div>
+
+      <div class="row m-1">
+        <div class="input-group mb-3">
+          <label for="password" class="input-group-text">Mot de passe </label>
+          <input type="password" name="password" class="form-control" placeholder="Password" required>
+        </div>
+      </div>
+      <div class="row m-1">
+        <button class="btn btn-success">Connexion</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="position-absolute top-0 start-50 translate-middle-x p-3" style="z-index: 11">
+    <div id="liveToast" class="toast text-white bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header text-white bg-danger">
+        <img src="/assets/image/LogoMcDo.png" class="rounded me-2 img-fluid">
+        <strong class="me-auto">Erreur connection</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        Les informations de connexion ne sont pas valides, veuillez réessayer avec les informations de connexion correctes.
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
+  </script>
+  <script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+    setInterval(() => {
+      window.location.reload();
+    }, 600000);
+  </script>
+</body>
+
+</html>
