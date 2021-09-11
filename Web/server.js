@@ -1,5 +1,3 @@
-const { exception } = require("console");
-
 let cors = require("cors"),
   helmet = require("helmet"),
   cookieParser = require("cookie-parser"),
@@ -149,7 +147,6 @@ app.route("/Horaire").post(async (_req, res) => {
         var FullData = [], end = false;
         await (body.Employe).forEach(async (elem, index) => {
           const cursor = await collection.find({ StartWeek: String(body.week), EmployePlanning: Number(elem) }).toArray();
-          console.log("Data : ", cursor);
           cursor.forEach(elem => FullData.push(elem));
 
           if ((body.Employe.length-1) === index) {
@@ -192,6 +189,7 @@ app.route("/Employe").post(async (_req, res) => {
     if (body.type === "new") {
       delete body.type;
       body.id = Number(body.id);
+      body.restaurant = Number(body.restaurant);
       body.MaxHour = Number(body.MaxHour);
       await collection.insertOne(body);
       res.redirect("/plannings")
@@ -201,8 +199,9 @@ app.route("/Employe").post(async (_req, res) => {
       delete body.type;
       var _id = body._id;
       delete body._id;
-      body.id = Number(body.id)
-      body.MaxHour = Number(body.MaxHour)
+      body.id = Number(body.id);
+      body.restaurant = Number(body.restaurant);
+      body.MaxHour = Number(body.MaxHour);
       await collection.updateOne({"_id" : ObjectId(_id)}, { $set: body }, { upsert: true });
       res.redirect("/plannings");
     }
@@ -221,7 +220,6 @@ app.route("/Employe").post(async (_req, res) => {
     if (body.type === "remove") {
       var result = await collection.deleteOne({"_id" : ObjectId(body._id)});
       var result2 = await collection2.deleteMany({ EmployePlanning: Number(body.id) });
-      console.log(result2)
       if (result.deletedCount === 1 && result2.deletedCount >= 0) {
         console.dir("Successfully deleted one document and Multiple or none Time Work.");
       } else {
@@ -275,8 +273,6 @@ app.route("/Connection").post(async (_req, res) => {
     var body = _req.body;
     console.log("[ User ] (body) - ", body)
     const cursor = await collection.findOne({ username: String(body.username) });
-
-    console.log("Value cursor : ", cursor);
 
     if (cursor === null) {console.log("No documents found!"); res.send(["Error Connection"])}
     else if (cursor !== null) {

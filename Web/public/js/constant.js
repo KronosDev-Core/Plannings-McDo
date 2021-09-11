@@ -445,6 +445,7 @@ const HTML = {
       </div>
   </div>`,
   TemplateFormEmployee: (data) => {
+    console.log(data)
     var title = data.type === "new" ? "New employee" : "Edit employee",
       DeleteBtn = data.type === "new" ? "disabled" : "",
       SendBtn = data.type === "new" ? "Save Employee" : "Edit Employee",
@@ -466,6 +467,8 @@ const HTML = {
     <form method="POST" action="/Employe">
         ${DefaultId}
         <input type="text" class="d-none" name="type" value="${data.type}">
+        <input type="text" class="d-none" name="pays" value="${data.account.pays}">
+        <input type="number" class="d-none" name="restaurant" value="${data.account.Restaurant}">
         <div class="row m-1">   
             <div class="col input-group">
                 <span class="input-group-text">Prénom et Nom</span>

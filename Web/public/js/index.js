@@ -75,6 +75,11 @@ kronos(() => {
           });
         });
 
+        kronos().keypress((key) => {
+          if (key.key === "Enter" && (kronos(HREF.IptUsername).value() && kronos(HREF.IptPassword).value())) {
+            SimulateEvent(kronos(HREF.BtnConnectionLandingPage)[0], 'click');
+          }
+        });
       })
     }
   )
