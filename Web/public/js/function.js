@@ -52,7 +52,7 @@ function ToFormatInputTime(time) {
 }
 
 function ToFormatCardFromTable(data) {
-  return data.replaceAll(/(<p class="Time-.*">|<p>)/gm, "").replaceAll("</p>", "").replaceAll('<hr class="dropdown-divider">', " ; ").replaceAll(/\n/gm, "").replaceAll("                    ", "").replaceAll(/^ /gm, "");
+  return data.replaceAll(/(<p class="Time-.*">|<p>)/gm, "").replaceAll("</p>", "").replaceAll("<div>", "").replaceAll("</div>", "").replaceAll('<hr class="dropdown-divider">', " ; ").replaceAll(/\n/gm, "").replaceAll("                    ", "").replaceAll(/^ /gm, "");
 }
 
 function GetDataTable(FullName, id, HourMonday, HourTuesday, HourWednesday, HourThursday, HourFriday, HourSaturday, HourSunday, TotalHour, HREF) {
@@ -129,3 +129,37 @@ function ReloadTooltips() {
 Array.prototype.last = function () {
   return this[this.length - 1];
 };
+
+function TimeWorkCurrent(SameWeek, data, FullHeure = null, request = false) {
+  if (SameWeek) {
+    var WarnningIcon = "", SameDay = false, Current = false;
+    if (request == false) {
+      var elemSplit = FullHeure.split(" - "), Time1 = elemSplit[0].split(":"), Time2 = elemSplit[1].split(":");
+    } else {
+      var Time1 = data.StartHour.split("."), Time2 = data.EndHour.split(".");
+    }
+    var h1 = Number(Time1[0]), m1 = Number(Time1[1]),
+        h2 = Number(Time2[0]), m2 = Number(Time2[1]),
+        h3 = new Date().getHours(), m3 = new Date().getMinutes();
+
+    if (h2 < 5) h2 += 23;
+
+    if ((h2-h1) >= 5 && m2 >= m1) WarnningIcon = '<i class="bi bi-exclamation-circle-fill text-warning me-2"></i>';
+
+    if (data.DayDate === `${new Date().setFullTime(2, 0, 0, 0)}`) {
+      SameDay = true;
+      if ((h3 > h1 && h3 < h2) || ((h3 == h1 && m3 >= m1) || (h3 == h2 && !(m3 > m2)))) {
+        Work = "text-warning";
+        Current = true;
+      } else {
+        if (h2 < h3 || (h2 == h3 && m3 >= m2)) Work = "text-success"
+        else Work = "text-danger";
+      }
+    } else {
+      if (new Date(Number(data.DayDate)).getDay() < new Date().getDay() || (new Date().getDay() === 0 && new Date(Number(data.DayDate)).getDay() != 0)) Work = "text-success"
+      else Work = "text-danger";
+    }
+
+    return [Work, WarnningIcon, SameDay, Current];
+  }
+}

@@ -2,7 +2,7 @@
 * {
   margin: 0;
   padding: 0;
-  transition: all 0.3s ease-in-out;
+  /*transition: all 0.3s ease-in-out;*/
   font-display: optional;
   font-family: "Cantarell", sans-serif;
 }
@@ -69,4 +69,16 @@ tbody tr th {
 
 input.hidden {
   display: none;
+}
+
+svg {
+  transition: all 0.3s ease-in-out;
+}
+
+.transition3s {
+  transition: all 0.3s ease-in-out;
+}
+
+.tooltip-inner {
+  white-space: nowrap;
 }

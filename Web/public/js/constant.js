@@ -39,10 +39,11 @@ const DATA = {
     KDU: "Double UHC",
     KCF: "Cuisson frit",
     KCV: "Cuisson viande",
-    KDC: "Double cuisson",
+    KCD: "Double cuisson",
     CK: "Close Cuisine",
     CL: "Close Lobby",
-    CC: "Close Comptoir"
+    CC: "Close Comptoir",
+    CC: "Close Plonge"
   },
   Pays: {
     "IM": "Île de Man",
@@ -305,67 +306,35 @@ const FUNCTION = {
         res = "";
 
       SplitHeure.forEach((element, index) => {
-        var Work = '';
-
-        if (SameWeek) {
-          var elemSplit = element.split(" - "), Time1 = elemSplit[0].split(":"), Time2 = elemSplit[1].split(":");
-          var h1 = Number(Time1[0]), m1 = Number(Time1[1]),
-              h2 = Number(Time2[0]), m2 = Number(Time2[1]),
-              h3 = new Date().getHours(), m3 = new Date().getMinutes();
-
-          if (h2 < 5) h2 += 23;
-  
-          
-          if (data[index].DayDate === `${new Date().setFullTime(2, 0, 0, 0)}`) {
-            if ((h3 > h1 && h3 < h2) || ((h3 == h1 && m3 >= m1) || (h3 == h2 && !(m3 > m2)))) {
-              Work = "text-warning";
-            } else {
-              if (h2 < h3 || (h2 == h3 && m3 >= m2)) Work = "text-success"
-              else Work = "text-danger";
-            }
-          } else {
-            if (new Date(Number(data[index].DayDate)).getDay() < new Date().getDay() || (new Date().getDay() === 0 && new Date(Number(data[index].DayDate)).getDay() != 0)) Work = "text-success"
-            else Work = "text-danger";
-          }
-        }
-
+        var [Work, WarnningIcon, _] = TimeWorkCurrent(SameWeek, data[index], FullHeure=element);
 
         if (index + 1 == SplitHeure.length) {
-          res += `<p class="Time-${data[index]._id} ${Work}">${element}</p>`;
+          res += `
+          <div>
+            ${WarnningIcon}
+            <p class="Time-${data[index]._id} ${Work}">${element}</p>
+          </div>`;
         } else {
-          res += `<p class="Time-${data[index]._id} ${Work}">${element}</p>
-                  <hr class="dropdown-divider">
-                  `;
+          res += `
+          <div>
+            ${WarnningIcon}
+            <p class="Time-${data[index]._id} ${Work}">${element}</p>
+          </div>
+          <hr class="dropdown-divider">
+          `;
         }
 
       });
 
       return res;
     } else {
-      var Work = '';
+      var [Work, WarnningIcon, _] = TimeWorkCurrent(SameWeek, data=data, FullHeure=FullHeure);
 
-      if (SameWeek) {
-        var elemSplit = FullHeure.split(" - "), Time1 = elemSplit[0].split(":"), Time2 = elemSplit[1].split(":");
-        var h1 = Number(Time1[0]), m1 = Number(Time1[1]),
-            h2 = Number(Time2[0]), m2 = Number(Time2[1]),
-            h3 = new Date().getHours(), m3 = new Date().getMinutes();
-
-        if (h2 < 5) h2 += 23;
-  
-        if (data.DayDate === `${new Date().setFullTime(2, 0, 0, 0)}`) {
-          if ((h3 > h1 && h3 < h2) || ((h3 == h1 && m3 >= m1) || (h3 == h2 && !(m3 > m2)))) {
-            Work = "text-warning";
-          } else {
-            if (h2 < h3 || (h2 == h3 && m3 >= m2)) Work = "text-success"
-            else Work = "text-danger";
-          }
-        } else {
-          if (new Date(Number(data.DayDate)).getDay() < new Date().getDay() || new Date(Number(data.DayDate)).getDay() != 0) Work = "text-success"
-          else Work = "text-danger";
-        }
-      }
-
-      return `<p class="Time-${data._id} ${Work}">${FullHeure}</p>`;
+      return `
+      <div class="d-flex">
+        ${WarnningIcon}
+        <p class="Time-${data._id} ${Work}">${FullHeure}</p>
+      </div>`;
     }
   },
 };
@@ -524,7 +493,7 @@ const HTML = {
       ${ErrorValidationForm}
     </div>
     <span class="input-group-text">Ligne</span>
-    <input type="text" class="form-control" name="line" placeholder="Ligne" value="${data.line === undefined ? "" : data.line}" ${data.line === undefined ? "disabled" : ""}>
+    <input type="text" class="form-control" name="Line" placeholder="Ligne" value="${data.Line === undefined ? "" : data.Line}" ${data.Line === undefined ? "disabled" : ""}>
     <div class="invalid-feedback">
         ${ErrorValidationForm}
     </div>
@@ -796,6 +765,24 @@ const HTML = {
     });
 
     return Option;
+  },
+  AccountPlannigns: (data) => {
+    if (data.permission == "view") {
+      return `
+      ${data.username}
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill ms-2" viewBox="0 0 16 16">
+          <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+          <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+      </svg>
+      `;
+    } else if (data.permission == "Administration") {
+      return `
+      ${data.username}
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill ms-2" viewBox="0 0 16 16">
+        <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+      </svg>
+      `;
+    }
   }
 };
 
@@ -885,4 +872,5 @@ const HREF = {
   BtnConnectionLandingPage: "#DivConnection > div:nth-child(3) > button",
   IptUsername: "#DivConnection > div:nth-child(1) > div > input",
   IptPassword: "#DivConnection > div:nth-child(2) > div > input",
+  DivConnectPlannings: "body > div.sticky-top > nav > div > div.d-flex > div > button:nth-child(1)",
 };

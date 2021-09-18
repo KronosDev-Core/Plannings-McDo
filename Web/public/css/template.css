@@ -1,0 +1,24 @@
+body {
+  background-color: #34495e;
+}
+
+body > div {
+  background-color: #7f8c8d;
+  border-radius: 25px;
+  top: 5%!important;
+  bottom: 5%!important;
+  left: 5%!important;
+  right: 5%!important;
+  width: 90%!important;
+  height: 90%!important;
+
+}
+
+body > div > div > div > div > div {
+  background-color: #bdc3c7;
+  border-radius: 25px;
+}
+
+img {
+  width: 10%!important;
+}

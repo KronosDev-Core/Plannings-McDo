@@ -286,8 +286,10 @@ app.route("/Connection").post(async (_req, res) => {
 });
 
 app.all(/.*/, (_req, _res) => {
-  console.log("[ Warning URL ] (_req) - ", _req.url);
-  _res.redirect("/Error");
+  if (_req.url !== "/favicon.ico") {
+    console.log("[ Warning URL ] (_req) - ", _req.url);
+    _res.redirect("/Error");
+  } else _res.destroy();
 });
 
 https
