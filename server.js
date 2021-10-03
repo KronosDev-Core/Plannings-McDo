@@ -11,8 +11,22 @@ let cors = require("cors"),
   https = require("https"),
   compression = require('compression'),
   MongoClient = require("mongodb").MongoClient,
-  ObjectId = require("mongodb").ObjectId;
+  ObjectId = require("mongodb").ObjectId,
+  execSync = require('child_process').execSync,
+  passport = require("passport")
+  LocalStrategy = require("passport-local").Strategy;
 require("dotenv").config();
+
+var finishFile = false;
+
+execSync('gulp', (err, stdout, stderr) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  console.log(stdout);
+  if (stdout.includes("Finished")) finishFile = true
+})
 
 // Configuration Database
 const uri = "mongodb://localhost:27017/", client = new MongoClient(uri, { useUnifiedTopology: true, poolSize: 50, loggerLevel: "error", appname: "APIServerMcDoPlannings" });
@@ -53,6 +67,8 @@ app.use(
 );
 app.use("/assets", express.static(path.join(__dirname, "public")));
 app.use("/assets", express.static(path.join(__dirname, "node_modules")));
+//app.use(passport.initialize());
+//app.use(passport.session());
 
 app.get("/", (_req, res) => {
   res.sendFile(path.join(__dirname + "/public/html/index.html"));
@@ -70,15 +86,19 @@ app.get("/plannings", (_req, _res) => {
   _res.sendFile(path.join(__dirname + "/public/html/plannings.html"))
 });
 
+function ErrorLogs(error, res) {
+  console.error("[ Error ] - User Redirect");
+  fs.appendFileSync("./LogServer.log", `${new Date().getTime()} - ${error}\n`);
+  res.redirect("/Error");
+}
+
 async function dev() {
   try {
     await client.connect();
     const db = client.db('PlanningsMcDonalds'), collection = db.collection('employe');
     await collection.updateMany({}, { $set: {pays: "fr", restaurant: 0} }, { upsert: true });
   } catch (error) {
-    console.error("[ Error ] - User Redirect");
-    fs.appendFileSync("./LogServer.log", `${new Date().getTime()} - ${error}\n`)
-    res.redirect("/Error")
+    ErrorLogs(error, res);
   }
 }
 
@@ -172,9 +192,7 @@ app.route("/Horaire").post(async (_req, res) => {
       res.redirect("/plannings");
     }
   } catch (error) {
-    console.error("[ Error ] - User Redirect");
-    fs.appendFileSync("./LogServer.log", `${new Date().getTime()} - ${error}\n`)
-    res.redirect("/Error")
+    ErrorLogs(error, res);
   }
 });
 
@@ -228,9 +246,7 @@ app.route("/Employe").post(async (_req, res) => {
       res.redirect("/plannings");
     }
   } catch (error) {
-    console.error("[ Error ] - User Redirect");
-    fs.appendFileSync("./LogServer.log", `${new Date().getTime()} - ${error}\n`)
-    res.redirect("/Error")
+    ErrorLogs(error, res);
   }
 });
 
@@ -259,9 +275,7 @@ app.route("/Geo").post(async (_req, res) => {
       }
     }
   } catch (error) {
-    console.error("[ Error ] - User Redirect");
-    fs.appendFileSync("./LogServer.log", `${new Date().getTime()} - ${error}\n`)
-    res.redirect("/Error")
+    ErrorLogs(error, res);
   }
 });
 
@@ -279,17 +293,13 @@ app.route("/Connection").post(async (_req, res) => {
       if (cursor.password === String(body.password) && cursor.permission === String(body.permission)) res.send([cursor])
     };
   } catch (error) {
-    console.error("[ Error ] - User Redirect");
-    fs.appendFileSync("./LogServer.log", `${new Date().getTime()} - ${error}\n`)
-    res.redirect("/Error")
+    ErrorLogs(error, res);
   }
 });
 
 app.all(/.*/, (_req, _res) => {
-  if (_req.url !== "/favicon.ico") {
-    console.log("[ Warning URL ] (_req) - ", _req.url);
-    _res.redirect("/Error");
-  } else _res.destroy();
+  console.log("[ Warning URL ] (_req) - ", _req.url);
+  _res.redirect("/Error");
 });
 
 https

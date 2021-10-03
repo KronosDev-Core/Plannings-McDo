@@ -1,344 +1,3 @@
-const ErrorValidationForm = "Ce Champ doit être rempli !";
-
-const DATA = {
-  DayWeekDate: [
-    "Dimanche",
-    "Lundi",
-    "Mardi",
-    "Mercredi",
-    "Jeudi",
-    "Vendredi",
-    "Samedi",
-  ],
-  DayWeekDataTable: [9, 3, 4, 5, 6, 7, 8],
-  Role: {
-    LST: "Service à table",
-    LCA: "Chargé d'acceuil",
-    LN: "Néttoyage lobby",
-    CPE: "Passage éxterieur",
-    CBL: "Boisson lobby",
-    CBD: "Boisson drive",
-    CG: "Glace",
-    CPB: "Passage boisson",
-    CVL: "Vérif lobby",
-    CVD: "Vérif Drive",
-    CEL: "Encaissement lobby",
-    CED: "Encaissement drive",
-    CRC: "Rappel Commande",
-    CTD: "Tablette drive",
-    CTL: "Tablette lobby",
-    COL: "OAT lobby",
-    COD: "OAT drive",
-    CO: "OAT",
-    CF: "Frite",
-    CRZ: "RZ Comptoir",
-    KRZ: "RZ Cuisine",
-    KP: "Pain",
-    KG: "Garniture",
-    KU: "UHC",
-    KDU: "Double UHC",
-    KCF: "Cuisson frit",
-    KCV: "Cuisson viande",
-    KCD: "Double cuisson",
-    CK: "Close Cuisine",
-    CL: "Close Lobby",
-    CC: "Close Comptoir",
-    CC: "Close Plonge"
-  },
-  Pays: {
-    "IM": "Île de Man",
-    "HR": "Croatie",
-    "GW": "Guinée-Bissau",
-    "IN": "Inde",
-    "KE": "Kenya",
-    "LA": "Laos",
-    "IO": "Territoire britannique de l'océan Indien",
-    "HT": "Haïti",
-    "LB": "Liban",
-    "GY": "Guyana",
-    "KG": "Kirghizistan",
-    "HU": "Hongrie",
-    "LC": "Sainte-Lucie",
-    "IQ": "Irak",
-    "KH": "Cambodge",
-    "JM": "Jamaïque",
-    "IR": "Iran",
-    "KI": "Kiribati",
-    "IS": "Islande",
-    "MA": "Maroc",
-    "JO": "Jordanie",
-    "IT": "Italie",
-    "JP": "Japon",
-    "MC": "Monaco",
-    "KM": "Comores",
-    "MD": "Moldavie",
-    "LI": "Liechtenstein",
-    "KN": "Saint-Christophe-et-Niévès",
-    "ME": "Monténégro",
-    "NA": "Namibie",
-    "MF": "Saint-Martin",
-    "LK": "Sri Lanka",
-    "KP": "Corée du Nord",
-    "MG": "Madagascar",
-    "NC": "Nouvelle-Calédonie",
-    "MH": "Îles Marshall",
-    "KR": "Corée du Sud",
-    "NE": "Niger",
-    "NF": "Île Norfolk",
-    "MK": "Macédoine",
-    "NG": "Nigéria",
-    "ML": "Mali",
-    "MM": "Myanmar (Birmanie)",
-    "LR": "Libéria",
-    "NI": "Nicaragua",
-    "KW": "Koweït",
-    "MN": "Mongolie",
-    "LS": "Lesotho",
-    "PA": "Panamá",
-    "MO": "Macau",
-    "LT": "Lituanie",
-    "KY": "Îles Caïmans",
-    "MP": "Îles Mariannes du Nord",
-    "LU": "Luxembourg",
-    "NL": "Pays-Bas",
-    "KZ": "Kazakhstan",
-    "MQ": "Martinique",
-    "LV": "Lettonie",
-    "MR": "Mauritanie",
-    "PE": "Pérou",
-    "MS": "Montserrat",
-    "QA": "Qatar",
-    "NO": "Norvège",
-    "PF": "Tahïti (Polynésie française)",
-    "MT": "Malte",
-    "LY": "Libye",
-    "NP": "Népal",
-    "PG": "Papouasie-Nouvelle-Guinée",
-    "MU": "Maurice",
-    "PH": "Philippines",
-    "MV": "Maldives",
-    "OM": "Oman",
-    "NR": "Nauru",
-    "MW": "Malawi",
-    "MX": "Mexico",
-    "PK": "Pakistan",
-    "MY": "Malaisie",
-    "NU": "Niue",
-    "PL": "Pologne",
-    "MZ": "Mozambique",
-    "PM": "Saint-Pierre-et-Miquelon",
-    "PN": "Îles Pitcairn",
-    "RE": "La Réunion",
-    "SA": "Arabie saoudite",
-    "SB": "Îles Salomon",
-    "NZ": "Nouvelle-Zélande",
-    "SC": "Seychelles",
-    "SD": "Soudan",
-    "PR": "Porto Rico",
-    "SE": "Suède",
-    "PS": "Territoires palestiniens occupés",
-    "PT": "Portugal",
-    "SG": "Singapour",
-    "TC": "Îles Turques-et-Caïques",
-    "SH": "Sainte-Hélène",
-    "TD": "Tchad",
-    "SI": "Slovénie",
-    "PW": "Palaos",
-    "SJ": "Svalbard et Jan Mayen",
-    "UA": "Ukraine",
-    "RO": "Roumanie",
-    "TF": "Terres australes et antarctiques françaises",
-    "SK": "Slovaquie",
-    "PY": "Paraguay",
-    "TG": "Togo",
-    "SL": "Sierra Leone",
-    "TH": "Thaïlande",
-    "SM": "Saint-Marin",
-    "SN": "Sénégal",
-    "RS": "Serbie (Yougoslavie)",
-    "TJ": "Tadjikistan",
-    "VA": "Cité du Vatican",
-    "SO": "Somalie",
-    "TK": "Tokelau",
-    "UG": "Ouganda",
-    "RU": "Russie",
-    "TL": "Timor oriental",
-    "VC": "Saint-Vincent-et-les-Grenadines",
-    "TM": "Turkménistan",
-    "SR": "Suriname",
-    "RW": "Rwanda",
-    "TN": "Tunisie",
-    "VE": "Venezuela",
-    "TO": "Tonga",
-    "ST": "Sao Tomé-et-Principe",
-    "VG": "Îles Vierges britanniques",
-    "SV": "Salvador",
-    "UM": "Îles mineures éloignées des États-Unis",
-    "TR": "Turquie",
-    "VI": "Îles Vierges(US)",
-    "WF": "Wallis-et-Futuna",
-    "TT": "Trinité-et-Tobago",
-    "SY": "Syrie",
-    "SZ": "Swaziland",
-    "TV": "Tuvalu",
-    "TW": "Taïwan",
-    "VN": "Viêt Nam",
-    "US": "États-Unis(USA)",
-    "TZ": "Tanzanie",
-    "YE": "Yémen",
-    "ZA": "Afrique du Sud",
-    "XK": "République du Kosovo",
-    "UY": "Uruguay",
-    "VU": "Vanuatu",
-    "UZ": "Ouzbékistan",
-    "WS": "Samoa",
-    "ZM": "Zambie",
-    "AC": "Île de l'Ascension",
-    "AD": "Andorre",
-    "YT": "Mayotte",
-    "AE": "Émirats arabes unis",
-    "YU": "Serbia and Montenegro",
-    "BA": "Serbie-et-Monténégro",
-    "AF": "Afghanistan",
-    "BB": "Barbade",
-    "AG": "Antigua-et-Barbuda",
-    "BD": "Bangladesh",
-    "AI": "Anguilla",
-    "BE": "Belgique",
-    "CA": "Canada",
-    "BF": "Burkina Faso",
-    "BG": "Bulgarie",
-    "ZW": "Zimbabwe",
-    "AL": "Albanie",
-    "CC": "Îles Cocos",
-    "BH": "Bahreïn",
-    "AM": "Arménie",
-    "CD": "République démocratique du Congo",
-    "BI": "Burundi",
-    "AN": "Antilles néerlandaises",
-    "BJ": "Bénin",
-    "AO": "Angola",
-    "CF": "République centrafricaine",
-    "CG": "République du Congo",
-    "AQ": "Antarctique",
-    "CH": "Suisse",
-    "BM": "Bermudes",
-    "AR": "Argentine",
-    "CI": "Côte d'Ivoire",
-    "BN": "Brunei Darussalam",
-    "DE": "Allemagne",
-    "AS": "Samoa américaines",
-    "BO": "Bolivie",
-    "AT": "Autriche",
-    "CK": "Îles Cook",
-    "AU": "Australie",
-    "CL": "Chili",
-    "EC": "Équateur",
-    "CM": "Cameroun",
-    "BR": "Brésil",
-    "AW": "Aruba",
-    "CN": "Chine",
-    "EE": "Estonie",
-    "BS": "Bahamas",
-    "DJ": "Djibouti",
-    "AX": "Åland",
-    "CO": "Colombie",
-    "BT": "Bhoutan",
-    "DK": "Danemark",
-    "EG": "Égypte",
-    "AZ": "Azerbaïdjan",
-    "EH": "Sahara occidental",
-    "BV": "Île Bouvet",
-    "DM": "Dominique",
-    "CR": "Costa Rica",
-    "BW": "Botswana",
-    "GA": "Gabon",
-    "DO": "République dominicaine",
-    "BY": "Biélorussie",
-    "GB": "Royaume-Uni",
-    "CU": "Cuba",
-    "BZ": "Bélize",
-    "CV": "Cap-Vert",
-    "GD": "Grenade",
-    "FI": "Finlande",
-    "GE": "Géorgie",
-    "FJ": "Fidji",
-    "CX": "Île Christmas",
-    "GF": "Guyane",
-    "FK": "Îles Malouines",
-    "CY": "Chypre",
-    "GG": "Guernesey",
-    "CZ": "République tchèque",
-    "GH": "Ghana",
-    "FM": "Micronésie",
-    "ER": "Érythrée",
-    "GI": "Gibraltar",
-    "ES": "Espagne",
-    "FO": "Îles Féroé",
-    "ET": "Éthiopie",
-    "GL": "Groenland",
-    "DZ": "Algérie",
-    "GM": "Gambie",
-    "ID": "Indonésie",
-    "FR": "France",
-    "GN": "Guinée",
-    "IE": "Irlande",
-    "HK": "Hong Kong",
-    "GP": "Guadeloupe",
-    "GQ": "Guinée équatoriale",
-    "HM": "Îles Heard-et-MacDonald",
-    "GR": "Grèce",
-    "HN": "Honduras",
-    "JE": "Jersey",
-    "GS": "Géorgie du Sud-et-les Îles Sandwich du Sud",
-    "FX": "France métropolitaine",
-    "GT": "Guatemala",
-    "GU": "Guam",
-    "IL": "Israël"
-  }
-};
-
-
-const FUNCTION = {
-  ConvertTimeTable: (FullHeure, data, SameWeek) => {
-    if (FullHeure.search(";") !== -1) {
-      var SplitHeure = FullHeure.split(";"),
-        res = "";
-
-      SplitHeure.forEach((element, index) => {
-        var [Work, WarnningIcon, _] = TimeWorkCurrent(SameWeek, data[index], FullHeure=element);
-
-        if (index + 1 == SplitHeure.length) {
-          res += `
-          <div>
-            ${WarnningIcon}
-            <p class="Time-${data[index]._id} ${Work}">${element}</p>
-          </div>`;
-        } else {
-          res += `
-          <div>
-            ${WarnningIcon}
-            <p class="Time-${data[index]._id} ${Work}">${element}</p>
-          </div>
-          <hr class="dropdown-divider">
-          `;
-        }
-
-      });
-
-      return res;
-    } else {
-      var [Work, WarnningIcon, _] = TimeWorkCurrent(SameWeek, data=data, FullHeure=FullHeure);
-
-      return `
-      <div class="d-flex">
-        ${WarnningIcon}
-        <p class="Time-${data._id} ${Work}">${FullHeure}</p>
-      </div>`;
-    }
-  },
-};
-
 const HTML = {
   SelectOptionEmployee: (data) => {
     return `<option value="${data._id}">${data.id} | ${
@@ -443,7 +102,7 @@ const HTML = {
                 <span class="input-group-text">Prénom et Nom</span>
                 <input type="text" class="form-control text-uppercase" name="name" placeholder="Prénom et Nom" aria-autocomplete="both" ${FullName} required>
                 <div class="invalid-feedback">
-                ${ErrorValidationForm}
+                ${DATA.ErrorValidationForm}
                 </div>
             </div>
         </div>
@@ -453,12 +112,12 @@ const HTML = {
                 <span class="input-group-text">Numéro de pointage</span>
                 <input type="number" class="form-control" name="id" placeholder="Numéro de pointage" ${id} required>
                 <div class="invalid-feedback">
-                    ${ErrorValidationForm}
+                    ${DATA.ErrorValidationForm}
                 </div>
                 <span class="input-group-text">Heure Max</span>
                 <input type="number" class="form-control" name="MaxHour" placeholder="Heure max" step="any" ${MaxHour} required>
                 <div class="invalid-feedback">
-                    ${ErrorValidationForm}
+                    ${DATA.ErrorValidationForm}
                 </div>
             </div>
         </div>
@@ -473,7 +132,8 @@ const HTML = {
     </form>
     `;
   },
-  InputRoleEmployee: (data) => { 
+  InputRoleEmployee: (data) => {
+    console.log(data)
     var Option = "", extra = false;
 
     if (data.Role !== "" && Object.keys(DATA.Role).indexOf(data.Role) !== -1) extra = true;
@@ -490,12 +150,12 @@ const HTML = {
       ${Option}
     </select>
     <div class="invalid-feedback">
-      ${ErrorValidationForm}
+      ${DATA.ErrorValidationForm}
     </div>
     <span class="input-group-text">Ligne</span>
-    <input type="text" class="form-control" name="Line" placeholder="Ligne" value="${data.Line === undefined ? "" : data.Line}" ${data.Line === undefined ? "disabled" : ""}>
+    <input type="text" class="form-control" name="Line" placeholder="Ligne" value="${data.Line === "" ? "" : data.Line}" ${data.Line === "" ? "disabled" : ""}>
     <div class="invalid-feedback">
-        ${ErrorValidationForm}
+        ${DATA.ErrorValidationForm}
     </div>
     `
   },
@@ -541,7 +201,7 @@ const HTML = {
                 <span class="input-group-text">Numéro de pointage</span>
                 <input type="number" class="form-control" name="id" placeholder="Numéro de pointage" value="${data.id}" readonly>
                 <div class="invalid-feedback">
-                    ${ErrorValidationForm}
+                    ${DATA.ErrorValidationForm}
                 </div>
 
                 
@@ -550,7 +210,7 @@ const HTML = {
                     Absent / Week-end
                 </div>
                 <div class="invalid-feedback">
-                    ${ErrorValidationForm}
+                    ${DATA.ErrorValidationForm}
                 </div>
             </div>
         </div>
@@ -560,17 +220,17 @@ const HTML = {
                 <span class="input-group-text">Date</span>
                 <input type="date" class="form-control" name="DayDate" ${DayDate} required ${PermDisabled}>
                 <div class="invalid-feedback">
-                  ${ErrorValidationForm}
+                  ${DATA.ErrorValidationForm}
                 </div>
                 <span class="input-group-text">Horaire</span>
                 <input type="time" class="form-control" name="StartHour" ${StartHour} required ${PermDisabled}>
                 <div class="invalid-feedback">
-                  ${ErrorValidationForm}
+                  ${DATA.ErrorValidationForm}
                 </div>
                 <span class="input-group-text">-</span>
                 <input type="time" class="form-control" name="EndHour" ${EndHour} required ${PermDisabled}>
                 <div class="invalid-feedback">
-                  ${ErrorValidationForm}
+                  ${DATA.ErrorValidationForm}
                 </div>
             </div>
         </div>
@@ -592,7 +252,6 @@ const HTML = {
     `;
   },
   TemplateLineTable: (data) => {
-    // ${FUNCTION.ConvertTimeTable("19:00 - 23:00")}
     return `
         <tr>
             <th name="id" scope="row">${data.id}</th>
@@ -625,7 +284,7 @@ const HTML = {
 
     if (data.type === "danger") {
       return `
-      <div class="my-2 p-1 w-80 text-center align-content-center align-items-center d-flex flex-row justify-content-evenly bagde rounded-pill alert alert-danger shadow container-fluid">
+      <div class="my-2 p-1 w-50 text-center align-content-center align-items-center d-flex flex-row justify-content-evenly bagde rounded-pill alert alert-danger shadow container-fluid">
         ${special}
         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-cpu-fill" viewBox="0 0 16 16">
           <path d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z" />
@@ -638,7 +297,7 @@ const HTML = {
 
     if (data.type === "moderate") {
       return `
-      <div class="my-2 p-1 w-80 text-center align-content-center align-items-center d-flex flex-row justify-content-evenly bagde rounded-pill alert alert-warning shadow container-fluid">
+      <div class="my-2 p-1 w-50 text-center align-content-center align-items-center d-flex flex-row justify-content-evenly bagde rounded-pill alert alert-warning shadow container-fluid">
       ${special}
         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
           <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
@@ -651,7 +310,7 @@ const HTML = {
 
     if (data.type === "chill") {
       return `
-      <div class="my-2 p-1 w-80 text-center align-content-center align-items-center d-flex flex-row justify-content-evenly bagde rounded-pill alert alert-success shadow container-fluid">
+      <div class="my-2 p-1 w-50 text-center align-content-center align-items-center d-flex flex-row justify-content-evenly bagde rounded-pill alert alert-success shadow container-fluid">
         ${special}
         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-person-dash-fill" viewBox="0 0 16 16">
           <path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z" />
@@ -664,7 +323,7 @@ const HTML = {
 
     if (data.type === "neutral") {
       return `
-      <div class="my-2 p-1 w-80 text-center align-content-center align-items-center d-flex flex-row justify-content-evenly bagde rounded-pill alert alert-light shadow container-fluid">
+      <div class="my-2 p-1 w-50 text-center align-content-center align-items-center d-flex flex-row justify-content-evenly bagde rounded-pill alert alert-light shadow container-fluid">
         <div>Abs</div>
       </div>
       `;
@@ -672,7 +331,7 @@ const HTML = {
 
     if (data.type === "pause") {
       return `
-      <div class="my-2 p-1 w-80 text-center align-content-center align-items-center d-flex flex-row justify-content-evenly bagde rounded-pill alert alert-light shadow container-fluid">
+      <div class="my-2 p-1 w-50 text-center align-content-center align-items-center d-flex flex-row justify-content-evenly bagde rounded-pill alert alert-light shadow container-fluid">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pause-fill" viewBox="0 0 16 16">
           <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/>
         </svg>  
@@ -682,7 +341,7 @@ const HTML = {
     }
   },
   OptionEmploye: `
-  <button class="btn btn-outline-dark border-0" data-bs-toggle="tooltip" tabindex="0" data-bs-placement="bottom" data-bs-html="true" title=""><i class="bi bi-clipboard"></i></button>
+  <button class="btn btn-outline-info border-0" data-bs-toggle="tooltip" tabindex="0" data-bs-placement="bottom" data-bs-html="true" title=""><i class="bi bi-clipboard"></i></button>
   <button class="btn btn-outline-warning border-0" data-bs-toggle="tooltip" tabindex="0" data-bs-placement="bottom" data-bs-html="true" title=""><i class="bi bi-cash-coin"></i></button>
   `,
   TemplateFormMainPage: (data) => {
@@ -766,7 +425,7 @@ const HTML = {
 
     return Option;
   },
-  AccountPlannigns: (data) => {
+  AccountPlannings: (data) => {
     if (data.permission == "view") {
       return `
       ${data.username}
@@ -775,7 +434,7 @@ const HTML = {
           <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
       </svg>
       `;
-    } else if (data.permission == "Administration") {
+    } else if (data.permission == "Administration" || data.permission == "Manager") {
       return `
       ${data.username}
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill ms-2" viewBox="0 0 16 16">
@@ -783,94 +442,42 @@ const HTML = {
       </svg>
       `;
     }
-  }
-};
+  },
+  TimeTable: (FullHeure, data, SameWeek) => {
+    if (FullHeure.search(";") !== -1) {
+      var SplitHeure = FullHeure.split(";"),
+        res = "";
 
-const HREF = {
-  DivFormCardFooter:
-    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-footer",
-  ListUniqueWorkerButton: "div.card-body > ul li button",
-  AnimationArrow: "RotateArrow",
-  RowTableCard:
-    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-body.table-responsive > table > tbody tr",
-  ListUniqueWorkerHeader:
-    "body > div.my-3.h-100.w-100.container-fluid > div > div.col > div > div.card-header > div > h5",
-  InputSelectEmployee:
-    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-footer > div.row.m-1 > div > select",
-  InputSelectEmployeeOption:
-    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-footer > div.row.m-1 > div > select option",
-  InputSelectOption: "#OptionAdmin > div.row.m-1 > div > select",
-  InputSelectOptionOption: "#OptionAdmin > div.row.m-1 > div > select option",
-  InputSelectSubOption: "div#SubOptionAdmin > div.row.m-1 > div > select",
-  InputSelectSubOptionOption:
-    "div#SubOptionAdmin > div.row.m-1 > div > select option",
-  DivNextAdminForm: "div#NextAdmin",
-  DivAdminOption: "#OptionAdmin",
-  DivAdminSubOption: "div#SubOptionAdmin",
-  InputFormID: "#NextAdmin > form > div:nth-child(3) > div > input",
-  InputFormDate:
-    "#NextAdmin > form > div:nth-child(4) > div > input:nth-child(2)",
-  InputFormStartWeek: "div#NextAdmin > form > input:nth-child(1)",
-  InputFormTimeStart:
-    "#NextAdmin > form > div:nth-child(4) > div > input:nth-child(5)",
-  InputFormTimeEnd:
-    "#NextAdmin > form > div:nth-child(4) > div > input:nth-child(8)",
-  InputFormCheckAbsent:
-    "#NextAdmin > form > div:nth-child(3) > div > div.form-control > input",
-  InputFormFullName: "#NextAdmin > form > div:nth-child(3) > div > input",
-  TitleTableCard:
-    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-header > div > h5",
-  ButtonFormCardFooter:
-    "div#NextAdmin > form > div.row.m-1.justify-content-md-center > div > button.btn.btn-outline-success",
-  ButtonDeleteForm:
-    "div#NextAdmin > form > div.row.m-1.justify-content-md-center > div > button.btn.btn-outline-danger",
-  BodyTable:
-    "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-body.table-responsive > table > tbody",
-  TableSpecificLine: (data) => {
-    if (data.column !== undefined) return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-body.table-responsive > table > tbody > tr:nth-child(${data.row}) > td:nth-child(${data.column})`
-    else return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto > div > div.card-body.table-responsive > table > tbody > tr:nth-child(${data.row})`
-  },
-  CardSpecificDay: (data) => {
-    return `#collapse${data}`;
-  },
-  SelectSpecificEmployee: (data) => {
-    return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-footer > div.row.m-1 > div > select > option[value='${data}']`;
-  },
-  SelectSpecificOptionEmploye: (data) => {return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-footer > div.row.m-1 > div > select > option:nth-child(${data})`},
-  SelectSpecificOption: (data) => {
-    return `#OptionAdmin > div.row.m-1 > div > select > option[value='${data}']`;
-  },
-  SelectSpecificSubOption: (data) => {
-    return `div#SubOptionAdmin > div.row.m-1 > div > select > option[value='${data}']`;
-  },
-  SelectTimeWeek: "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-header > div > select",
-  SelectTimeWeekAllOption: "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-header > div > select option",
-  SelectTimeWeekOption: (data) => {
-    return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-header > div > select > option:nth-child(${data+1})`
-  },
-  SpecificColumnTable: (data) => { return `body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-body.table-responsive > table * > tr *:nth-child(${data})` },
-  SpecificDropDownCard: (data) => { return `body > div.my-3.h-100.w-100.container-fluid > div > div.col > div > div.card-body > ul > li > button > div[value="${data}"]`; },
-  AllPTextWarning: "body > div.my-3.h-100.w-100.container-fluid > div > div.col-auto.mb-3 > div > div.card-body.table-responsive > table > tbody > tr td p.text-warning",
-  PTotalEmpWork: "p#TotalEmpWork",
-  BtnOptionEmploye: "#BtnOptionEmploye",
-  DivOptionEmploye: "#OptionEmploye",
-  BtnSalaireEmploye: "#OptionEmploye > button.btn.btn-outline-warning.border-0",
-  BtnRoleEmploye: "#OptionEmploye > button.btn.btn-outline-dark.border-0",
-  RoleEmployeeWorkTimeDiv: "#NextAdmin > form > div:nth-child(6) > div",
-  InputSelectRole: "#NextAdmin > form > div:nth-child(6) > div > select",
-  BtnSearchBar: "body > div.sticky-top.bg-light > nav > div > div.d-flex > button.btn.LogoMcDo.me-4",
-  InputSearchBar: "body > div.sticky-top.bg-light > nav > div > div.d-flex > input",
-  InputLineWork: "#NextAdmin > form > div:nth-child(6) > div > input",
-  MainPageBtn: "body > div > div:nth-child(2) > div.d-flex.flex-row.align-content-between.m-auto.my-2 button",
-  MainPageDivBtn: "body > div > div:nth-child(2) > div.d-flex.flex-row.align-content-between.m-auto.my-2",
-  DivMainPageForm: "body > div > div:nth-child(2)",
-  SelectMainPage: "body > div > div:nth-child(2) div div select",
-  SelectDepartement: "body > div > div:nth-child(2) > div:nth-child(2) > div > select",
-  divSpecificMainPage: (data) => {return `body > div > div:nth-child(2) > div:nth-child(${data})`},
-  SelectSpecificMainPage: (data) => {return `body > div > div:nth-child(2) > div:nth-child(${data}) > div > select`},
-  DivConnectionLandingPage: "#DivConnection",
-  BtnConnectionLandingPage: "#DivConnection > div:nth-child(3) > button",
-  IptUsername: "#DivConnection > div:nth-child(1) > div > input",
-  IptPassword: "#DivConnection > div:nth-child(2) > div > input",
-  DivConnectPlannings: "body > div.sticky-top > nav > div > div.d-flex > div > button:nth-child(1)",
+      SplitHeure.forEach((element, index) => {
+        var [Work, WarnningIcon, _] = TimeWorkCurrent(SameWeek, data[index], FullHeure=element);
+
+        if (index + 1 == SplitHeure.length) {
+          res += `
+          <div>
+            ${WarnningIcon}
+            <p class="Time-${data[index]._id} ${Work}">${element}</p>
+          </div>`;
+        } else {
+          res += `
+          <div>
+            ${WarnningIcon}
+            <p class="Time-${data[index]._id} ${Work}">${element}</p>
+          </div>
+          <hr class="dropdown-divider">
+          `;
+        }
+
+      });
+
+      return res;
+    } else {
+      var [Work, WarnningIcon, _] = TimeWorkCurrent(SameWeek, data=data, FullHeure=FullHeure);
+
+      return `
+      <div class="d-flex">
+        ${WarnningIcon}
+        <p class="Time-${data._id} ${Work}">${FullHeure}</p>
+      </div>`;
+    }
+  }
 };

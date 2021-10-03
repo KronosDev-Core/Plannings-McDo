@@ -35,6 +35,10 @@ Number.prototype.round = function () {
   return Math.round((this + Number.EPSILON) * 100) / 100;
 }
 
+Array.prototype.last = function () {
+  return this[this.length - 1];
+};
+
 function getFormatInputTime(time) {
   var H = time.split(":")[0],
     m = time.split(":")[1],
@@ -126,10 +130,6 @@ function ReloadTooltips() {
   });
 }
 
-Array.prototype.last = function () {
-  return this[this.length - 1];
-};
-
 function TimeWorkCurrent(SameWeek, data, FullHeure = null, request = false) {
   if (SameWeek) {
     var WarnningIcon = "", SameDay = false, Current = false;
@@ -161,5 +161,71 @@ function TimeWorkCurrent(SameWeek, data, FullHeure = null, request = false) {
     }
 
     return [Work, WarnningIcon, SameDay, Current];
+  }
+}
+
+function SpecificDay(data, index, indexSplit=null, base=null) {
+  if (Number(data.split(":")[0]) < 15) {
+    if (Number(data.split(":")[0]) < 10 && Number(data.split("-")[1].split(":")[0]) < 12) kronos(HREF.CardSpecificDay(DATA.DayWeekDate[index])).append(HTML.TemplateLineCard({
+      type: "chill",
+      time: data,
+      open: true
+    }));
+    else kronos(HREF.CardSpecificDay(DATA.DayWeekDate[index])).append(HTML.TemplateLineCard({
+      type: "moderate",
+      time: data
+    }));
+  } else if (Number(data.split(":")[0]) >= 18) {
+    if ((Number(data.split("-")[1].split(":")[0]) < 5) || (Number(data.split("-")[1].split(":")[0]) === 23 && Number(data.split("-")[1].split(":")[1]) > 0)) {
+      if (index === 0 || index >= 5) kronos(HREF.CardSpecificDay(DATA.DayWeekDate[index])).append(HTML.TemplateLineCard({
+        type: "moderate",
+        time: data,
+        close: true
+      }))
+      else kronos(HREF.CardSpecificDay(DATA.DayWeekDate[index])).append(HTML.TemplateLineCard({
+        type: "chill",
+        time: data,
+        close: true
+      }))
+    } else {
+      kronos(HREF.CardSpecificDay(DATA.DayWeekDate[index])).append(HTML.TemplateLineCard({
+        type: "danger",
+        time: data
+      }));
+    };
+  } else {
+    kronos(HREF.CardSpecificDay(DATA.DayWeekDate[index])).append(HTML.TemplateLineCard({
+      type: "chill",
+      time: data
+    }));
+  }
+
+  if (base !== null && indexSplit !== null) {
+    if (base.split(";").length !== (indexSplit + 1)) {
+      var now = data,
+        after = base.split(";")[indexSplit + 1];
+      var [nowH, nowM] = now.split("-")[1].split(":"),
+        [afterH, afterM] = after.split("-")[0].split(":");
+      (Number(afterH)-Number(nowH)==0&&Number(afterM)-Number(nowM)==30||Number(afterH)-Number(nowH)==1&&Number(afterM)-Number(nowM)==-30)&&kronos(HREF.CardSpecificDay(DATA.DayWeekDate[index])).append(HTML.TemplateLineCard({type:"pause",time:data}));
+    }
+  }
+}
+
+function Search(EmployeTableLine, EmployeNameId) {
+  var value = kronos(HREF.InputSearchBar).value();
+  if (value !== "") {
+    if (!isNaN(Number(value))) {
+      kronos(HREF.TableSpecificLine({row: EmployeTableLine[Number(value)]++}))[0].scrollIntoView(true);
+    } else {
+      if (EmployeNameId[value] !== undefined) {
+        if (Object.keys(EmployeNameId).indexOf(value) !== 1) kronos(HREF.TableSpecificLine({row: EmployeTableLine[EmployeNameId[value]]++}))[0].scrollIntoView(true);
+      } else {
+        Object.keys(EmployeNameId).forEach((elem, index) => {
+          elemif = elem.toLowerCase();
+          value = String(value).toLowerCase();
+          if (elemif.includes(value)) kronos(HREF.TableSpecificLine({row: EmployeTableLine[EmployeNameId[elem]]++}))[0].scrollIntoView(true);
+        })
+      }
+    }
   }
 }
